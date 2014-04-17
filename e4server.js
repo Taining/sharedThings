@@ -9,7 +9,7 @@ wss.on('close', function() {
 
 wss.broadcast = function(data) {
     for(var i in this.clients)
-        this.clients[i].send(JSON.stringify(data));
+        this.clients[i].send(data);
 };
 
 wss.on('connection', function(ws) {
