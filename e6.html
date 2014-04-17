@@ -36,6 +36,10 @@
 			}
 
 			$(function() { 
+				$(".draggable").each(function(key, value){
+					world[$(this).attr("id")] = $(this).position();
+				}); 
+				
 				//set up web socket
 				socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
 				socket.onopen = function (event) {
@@ -53,10 +57,6 @@
 				$("#world img").on("dragstart", function(event, ui) { logDrag(event, ui); });
 				$("#world img").on("dragstop" , function(event, ui) { logDrag(event, ui); });
 				$("#world img").on("drag"     , function(event, ui) { logDrag(event, ui); });
-
-				$(".draggable").each(function(key, value){
-					world[$(this).attr("id")] = $(this).position();
-				}); 
 			});
 		</script>
 	</head>
