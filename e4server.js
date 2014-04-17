@@ -13,6 +13,7 @@ wss.broadcast = function(data) {
 };
 
 wss.on('connection', function(ws) {
+	console.log(JSON.stringify(world));
 	ws.send(JSON.stringify(world));
 	ws.on('message', function(message) {
 		world = JSON.parse(message);
