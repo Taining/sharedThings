@@ -9,11 +9,11 @@ wss.on('close', function() {
 
 wss.broadcast = function(data) {
     for(var i in this.clients)
-        this.clients[i].send(data);
+        this.clients[i].send(JSON.stringify(data));
 };
 
 wss.on('connection', function(ws) {
-	ws.send(world);
+	ws.send(JSON.stringify(world));
 	ws.on('message', function(message) {
 		world = JSON.parse(message);
 		wss.broadcast(message);
