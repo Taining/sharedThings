@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+  		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>Shared Things</title>
+
+		<!-- <link href="jquery-ui-1.10.4.custom/css/smoothness/jquery-ui-1.10.4.custom.css" rel="stylesheet"> ignore jquery ui styles, eventually we will use bootstrap styles -->
+
+                <script src="bootstrap/js/jquery.min.js"></script> <!-- version of jquery for bootstrap -->
+                <script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough of jquery ui for dragging, no more -->
+                <script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ -->
+		<style>
+			.draggable { position: fixed; } 
+		</style>
+		<script src="config.js" ></script>
+		<script>
+			var world = {};
+			var socket;
+			function logDrag(event, ui){
+				//console.log(JSON.stringify(ui.position) + " " + event.target.id);
+				world[event.target.id] = ui.position;
+				socket.send(JSON.stringify(world)); 
+			}
+
+			function updateWorld(){
+				for(var elementId in world){
+					var position = world[elementId];
+					$("#"+elementId).css({
+						'top': position["top"],
+						'left': position["left"]
+					});
+				}
+			}
+
+			$(function() { 
+				$(".draggable").each(function(key, value){
+					world[$(this).attr("id")] = $(this).position();
+				}); 
+				console.log(JSON.stringify(world));
+
+				//set up web socket
+				socket = new WebSocket("ws://localhost:" + port);
+				socket.onopen = function (event) {
+  					socket.send(JSON.stringify(world));
+					console.log("connected");
+				};
+				socket.onclose = function (event) {
+					alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
+				};
+				socket.onmessage = function (event) {
+					world = JSON.parse(event.data);
+					updateWorld();
+				}
+
+				$("#world img").draggable(); 
+				$("#world img").on("dragstart", function(event, ui) { logDrag(event, ui); });
+				$("#world img").on("dragstop" , function(event, ui) { logDrag(event, ui); });
+				$("#world img").on("drag"     , function(event, ui) { logDrag(event, ui); });
+			});
+		</script>
+	</head>
+	<body>
+		<div id="world">
+			<img id="x1" src="images/x.gif" style="z-index:2;" class="draggable" />
+			<img id="x2" src="images/x.gif" style="z-index:2;" class="draggable" />
+			<img id="x3" src="images/x.gif" style="z-index:2;" class="draggable" />
+			<img id="x4" src="images/x.gif" style="z-index:2;" class="draggable" />
+			<img id="x5" src="images/x.gif" style="z-index:2;" class="draggable" />
+			<img id="o1" src="images/o.gif" style="z-index:2;" class="draggable" />
+			<img id="o2" src="images/o.gif" style="z-index:2;" class="draggable" />
+			<img id="o3" src="images/o.gif" style="z-index:2;" class="draggable" />
+			<img id="o4" src="images/o.gif" style="z-index:2;" class="draggable" />
+			<img id="o5" src="images/o.gif" style="z-index:2;" /class="draggable" >
+			<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" class="draggable" />
+		</div>
+	</body>
+</html>

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+    		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>Shared Things</title>
+		<!-- JQuery etc... -->
+       		<!-- <link href="jquery-ui-1.10.4.custom/css/smoothness/jquery-ui-1.10.4.custom.css" rel="stylesheet"> ignore jquery ui styles in favour of bootstrap --> 
+		<script src="bootstrap/js/jquery.min.js"></script> 
+
+        	<script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough jquery ui for dragging  -->
+		<script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ so jquery dragging is touch enabled -->
+
+		<!-- Bootstrap -->
+		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<!-- Include all compiled plugins (below), or include individual files as needed -->
+
+		<style>
+			.draggable { position: fixed; } 
+		</style>
+		<script>
+			function logDrag(event, ui){
+				console.log(JSON.stringify(ui.position) + " " + event.target.id); 
+			}
+			$(function() { 
+				$("#world img").draggable(); 
+				$("#world img").on("dragstart", function(event, ui) { logDrag(event, ui); });
+				$("#world img").on("dragstop" , function(event, ui) { logDrag(event, ui); });
+				$("#world img").on("drag"     , function(event, ui) { logDrag(event, ui); });
+			});
+		</script>
+	</head>
+
+  <body style="padding-top:70px; padding-bottom:70px;" >
+<!-- try {.navbar-fixed-top, .navbar-fixed-bottom, .navbar-static-top} X {.navbar-inverse }
+     have to add padding-top:70px, or padding-bottom:70px for fixed navbar
+-->
+<nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Brand</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Link</a></li>
+        <li><a href="#">Link</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+            <li class="divider"></li>
+            <li><a href="#">One more separated link</a></li>
+          </ul>
+        </li>
+      </ul>
+      <form class="navbar-form navbar-left">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search">
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#">Link</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<div id="world">
+					<img id="x1" src="images/x.gif" style="z-index:2;" class="draggable" />
+					<img id="x2" src="images/x.gif" style="z-index:2;" class="draggable" />
+					<img id="x3" src="images/x.gif" style="z-index:2;" class="draggable" />
+					<img id="x4" src="images/x.gif" style="z-index:2;" class="draggable" />
+					<img id="x5" src="images/x.gif" style="z-index:2;" class="draggable" />
+					<img id="o1" src="images/o.gif" style="z-index:2;" class="draggable" />
+					<img id="o2" src="images/o.gif" style="z-index:2;" class="draggable" />
+					<img id="o3" src="images/o.gif" style="z-index:2;" class="draggable" />
+					<img id="o4" src="images/o.gif" style="z-index:2;" class="draggable" />
+					<img id="o5" src="images/o.gif" style="z-index:2;" /class="draggable" >
+					<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" class="draggable" />
+				</div>
+			</div>
+		</div>
+	</div>
+		<!-- Bootstrap -->
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+  </body>
+</html>
+
