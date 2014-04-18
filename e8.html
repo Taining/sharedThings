@@ -55,7 +55,15 @@
 
 			}
 
-			function setupSocket(){
+			$(function() { 
+				$(".draggable").draggable({
+    				containment: 'parent'
+				});
+
+				$(".draggable").each(function(key, value){
+					world[$(this).attr("id")] = $(this).position();
+				}); 
+				
 				socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
 				socket.onopen = function (event) {
   					
@@ -70,18 +78,6 @@
 						updateWorld();
 					};
 				}
-			}
-
-			$(function() { 
-				$(".draggable").draggable({
-    				containment: 'parent'
-				});
-
-				$(".draggable").each(function(key, value){
-					world[$(this).attr("id")] = $(this).position();
-				}); 
-				
-				setupSocket();
 
 				$("#world img").draggable(); 
 				$("#world img").on("dragstart", function(event, ui) { logDrag(event, ui); });

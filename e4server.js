@@ -13,8 +13,10 @@ wss.broadcast = function(data) {
 };
 
 function sendWorldForNewClient(ws){
-	var response = {'action': 'update', 'worldName': 'undefined', 'world': worldArray['undefined']};
-	ws.send(JSON.stringify(response));
+	if (worldArray['undefined']) {
+		var response = {'action': 'update', 'worldName': 'undefined', 'world': worldArray['undefined']};
+		ws.send(JSON.stringify(response));
+	};
 }
 
 wss.on('connection', function(ws) {
