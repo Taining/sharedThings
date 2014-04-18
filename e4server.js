@@ -18,6 +18,8 @@ wss.on('connection', function(ws) {
 		var request = JSON.parse(message);
 		var worldName = request['worldName'];
 		
+		console.log(JSON.stringify(worldArray));
+
 		if (request['action'] == "update") {
 			worldArray[worldName] = request['world'];
 			wss.broadcast(message);
