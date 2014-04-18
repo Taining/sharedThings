@@ -29,12 +29,9 @@ wss.on('connection', function(ws) {
 			// worldArray[worldName] = request['world'];
 			
 			var objectID = request['objectID'];
-			worldArray[worldName][objectID] = request['position'];
+			world[objectID] = request['position'];
 			
 			wss.broadcast(message);
-		} else if (request['action'] == "save") {
-			worldArray[worldName] = request['world'];
-			wss.broadcastWorldsName();
 		}
 		
 	});

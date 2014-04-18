@@ -30,7 +30,7 @@
 				socket.send(JSON.stringify(request)); 
 			}
 
-			function updateWorld(){
+			function updateWholeWorld(){
 				for(var elementId in world){
 					var position = world[elementId];
 					$("#"+elementId).css({
@@ -38,6 +38,17 @@
 						'left': position["left"]
 					});
 				}
+			}
+			
+			function updateWorld(message) {
+				var elementId = message['objectID'];
+				var position = message['position']
+				world[elementId] = message['position'];
+				
+				$("#"+elementId).css({
+					'top': position["top"],
+					'left': position["left"]
+				});
 			}
 
 			$(function() { 
@@ -54,8 +65,13 @@
 					alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
 				};
 				socket.onmessage = function (event) {
-					world = JSON.parse(event.data);
-					updateWorld();
+					var message = JSON.parse(event.data);
+					if(message['action'] == 'getWorld') {
+						world = message['world'];
+						updateWholeWorld();
+					} else if(message['action'] == 'update') {
+						updateWorld(message);
+					}
 				}
 
 				$("#world img").draggable(); 
