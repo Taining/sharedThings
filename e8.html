@@ -47,6 +47,9 @@
 			function saveWorld(){
 				worldName = $("#world-name").val();
 				var request = {'action': 'save', 'worldName': worldName, 'world': world};
+
+				console.log(JSON.stringify(request));
+
 				socket.send(JSON.stringify(request));
 			}
 

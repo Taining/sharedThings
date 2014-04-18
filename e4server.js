@@ -12,8 +12,13 @@ wss.broadcast = function(data) {
         this.clients[i].send(data);
 };
 
+function sendWorldForNewClient(ws){
+	var response = {'action': 'update', 'worldName': 'undefined', 'world': worldArray['undefined']};
+	ws.send(JSON.stringify(response));
+}
+
 wss.on('connection', function(ws) {
-	ws.send(JSON.stringify(worldArray['undefined']));
+	sendWorldForNewClient(ws);
 	ws.on('message', function(message) {
 		var request = JSON.parse(message);
 		var worldName = request['worldName'];
