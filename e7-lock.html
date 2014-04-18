@@ -27,11 +27,15 @@
 				position: absolute;
 				top: 4em;
 			}
+			#message {
+				color: red;
+			}
 		</style>
 		<script src="config.js" ></script>
 		<script>
 			var world = {};
-			var canDrag = [];
+			var locked = [];	// array of boolean
+			var holdLock = [];	// array of boolean
 			
 			var socket;
 			function handleDrag(event, ui){
@@ -39,10 +43,41 @@
 				//world[event.target.id] = ui.position;
 				//socket.send(JSON.stringify(world)); 
 				
-				var objectID = event.target.id;				
+				var objectID = event.target.id;
+				
+				if(locked[objectID] && !holdLock[objectID]) {
+					return;
+				}
+				
 				var position = ui.position;
 				var request = {'action': 'update', 'objectID': objectID, 'position': ui.position};
 				socket.send(JSON.stringify(request)); 
+			}
+			
+			function handleDragStart(event, ui){
+				var objectID = event.target.id;
+				if(locked[objectID]) {
+					$("#message").html("Someone else is dragging this");
+					return;
+				}
+				holdLock[objectID] = true;
+				var request = {'action': 'lock', 'objectID': objectID};
+				
+				handleDrag(event, ui);
+			}
+			
+			function handleDragEnd(event, ui){
+				var objectID = event.target.id;	
+				
+				if(locked[objectID] && !holdLock[objectID]) {
+					$("#message").html("");
+					return;
+				}
+				
+				var request = {'action': 'unlock', 'objectID': objectID};			
+				
+				handleDrag(event, ui);
+				holdLock[objectID] = false;
 			}
 
 			function updateWholeWorld(){
@@ -66,6 +101,11 @@
 				});
 			}
 
+			function getLockArray() {
+				var request = {'action': 'getLockArray', 'proposedArray': locked};
+				socket.send(JSON.stringify(request)); 
+			}
+
 			$(function() { 
 				$(".draggable").each(function(key, value){
 					world[$(this).attr("id")] = $(this).position();
@@ -73,12 +113,19 @@
 				
 				//set up web socket
 				socket = new WebSocket("ws://localhost:" + port);
+				
 				socket.onopen = function (event) {
-  					
+  					$(".draggable").each(function() {
+  						holdLock[$(this).attr("id")] = false;
+  						locked[$(this).attr("id")] = false;
+  					});
+  					getLockArray();
 				};
+				
 				socket.onclose = function (event) {
 					alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
 				};
+				
 				socket.onmessage = function (event) {
 					var message = JSON.parse(event.data);
 					if(message['action'] == 'getWorld') {
@@ -86,13 +133,19 @@
 						updateWholeWorld();
 					} else if(message['action'] == 'update') {
 						updateWorld(message);
+					} else if(message['action'] == 'lock') {
+						locked[message['objectID']] = true;
+					} else if(message['action'] == 'unlock') {
+						locked[message['objectID']] = false;
+					} else if(message['action'] == 'sendLockArray') {
+						locked = message['array'];
 					}
 				}
 
 				$(".draggable").draggable(); 
-				$(".draggable").on("dragstart", function(event, ui) { handleDrag(event, ui); });
+				$(".draggable").on("dragstart", function(event, ui) { handleDragStart(event, ui); });
 				$(".draggable").on("dragstop" , function(event, ui) { handleDrag(event, ui); });
-				$(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
+				$(".draggable").on("drag"     , function(event, ui) { handleDragEnd(event, ui); });
 			});
 		</script>
 	</head>
@@ -109,6 +162,9 @@
 			<img id="o4" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
 			<img id="o5" src="images/o.gif" style="z-index:2;" class="draggable element-o" >
 			<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" />
+		</div>
+		<div id="message">
+		
 		</div>
 	</body>
 </html>
