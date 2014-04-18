@@ -96,7 +96,7 @@
     			});
 
 				$(".draggable").draggable({
-    				containment: 'parent'
+    				containment: $(this).parent()
 				});
 
 				$(".draggable").each(function(key, value){
