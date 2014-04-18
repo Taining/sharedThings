@@ -1,7 +1,7 @@
 var config = require('./config_node.js');
 
 var WebSocketServer = require('ws').Server, wss = new WebSocketServer({port: config.port});
-var worldArray = {};
+var worldArray = {'Default': ''};
 
 wss.on('close', function() {
     console.log('disconnected');
@@ -20,8 +20,8 @@ wss.broadcastWorldsName = function (){
 }
 
 function sendWorldForNewClient(ws){
-	if (worldArray['undefined']) {
-		var response = {'action': 'update', 'worldName': 'undefined', 'world': worldArray['undefined']};
+	if (worldArray['Default']) {
+		var response = {'action': 'update', 'worldName': 'Default', 'world': worldArray['Default']};
 		ws.send(JSON.stringify(response));
 	};
 }
@@ -50,3 +50,23 @@ wss.on('connection', function(ws) {
 		}
 	});
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
