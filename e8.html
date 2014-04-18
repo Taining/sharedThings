@@ -51,8 +51,12 @@
 				socket.send(JSON.stringify(request));
 			}
 
-			function displayWorlds(){
-
+			function displayWorlds(worldNames){
+				var html = "<h2>All worlds</h2>";
+				for(var name in worldNames){
+					html += "<li>" + worldNames[name] + "</li>";
+				}
+				$("#world-list").html(html);
 			}
 
 			function setupSocket(){
@@ -65,13 +69,9 @@
 				};
 				socket.onmessage = function (event) {
 					var message = JSON.parse(event.data);
-					if (message['action'] = 'displayWorlds') {
+					if (message['action'] == 'displayWorlds') {
 						var worldNames = message['worlds'];
-						var html = "<h2>All worlds</h2>";
-						for(var name in worldNames){
-							html += "<li>" + worldNames[name] + "</li>";
-						}
-						$("#world-list").html(html);
+						displayWorlds(worldNames);
 					} else if (message['action'] == 'update' && message['worldName'] == worldName) {
 						world = message['world'];
 						updateWorld();
