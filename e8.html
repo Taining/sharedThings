@@ -54,7 +54,7 @@
 			function displayWorlds(worldNames){
 				var html = "<h2>All worlds</h2>";
 				for(var name in worldNames){
-					html += "<li><a onclick='chooseWorld($(this));'>" + worldNames[name] + "</a></li>";
+					html += "<li><a href='#' onclick='chooseWorld($(this));'>" + worldNames[name] + "</a></li>";
 				}
 				$("#world-list").html(html);
 			}
@@ -84,7 +84,11 @@
 				}
 			}
 
-			$(function() { 
+			$(function() {
+				$("a").click(function(event){
+    				event.preventDefault();
+    			});
+
 				$(".draggable").draggable({
     				containment: 'parent'
 				});
