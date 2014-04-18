@@ -27,6 +27,7 @@
 				height: 189px;
 				margin: 0 auto;
 			}
+
 		</style>
 		<script src="config.js" ></script>
 		<script>
@@ -34,13 +35,16 @@
 			var socket;
 			var worldName = "Default";
 
-			function logDrag(event, ui){
-				world[event.target.id] = ui.position;
-				var request = {'action': 'update', 'worldName': worldName, 'world': world};
+			function handleDrag(event, ui){
+				// world[event.target.id] = ui.position;
+				// var request = {'action': 'update', 'worldName': worldName, 'world': world};
+				var objectID = event.target.id;
+				var position = ui.position;
+				var request = {'action': 'update', 'worldName': worldName, 'objectID': objectID, 'position': ui.position};
 				socket.send(JSON.stringify(request)); 
 			}
 
-			function updateWorld(){
+			function updateWholeWorld(){
 				for(var elementId in world){
 					var position = world[elementId];
 					$("#"+elementId).css({
@@ -48,6 +52,17 @@
 						'left': position["left"]
 					});
 				}
+			}
+			
+			function updateWorld(message) {
+				var elementId = message['objectID'];
+				var position = message['position']
+				world[elementId] = message['position'];
+				
+				$("#"+elementId).css({
+					'top': position["top"],
+					'left': position["left"]
+				});
 			}
 
 			function saveWorld(){
@@ -71,7 +86,7 @@
 			}
 
 			function setupSocket(){
-				socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
+				socket = new WebSocket("ws://localhost:" + port);
 				socket.onopen = function (event) {
   					
 				};
@@ -84,8 +99,8 @@
 						var worldNames = message['worlds'];
 						displayWorlds(worldNames);
 					} else if (message['action'] == 'update' && message['worldName'] == worldName) {
-						world = message['world'];
-						updateWorld();
+						// world = message['world'];
+						updateWorld(message);
 					};
 				}
 			}
@@ -106,10 +121,17 @@
 				setupSocket();
 
 				$(".draggable").draggable(); 
-				$(".draggable").on("dragstart", function(event, ui) { logDrag(event, ui); });
-				$(".draggable").on("dragstop" , function(event, ui) { logDrag(event, ui); });
-				$(".draggable").on("drag"     , function(event, ui) { logDrag(event, ui); });
+				$(".draggable").on("dragstart", function(event, ui) { handleDrag(event, ui); });
+				$(".draggable").on("dragstop" , function(event, ui) { handleDrag(event, ui); });
+				$(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
+				
+				$("body").css({
+					width: $(window).width() - 20, // subtract twice the thickness
+					height: $(window).height() - 20, // of the border from each dimension
+					border: '10px solid green'
+				});
 			});
+			
 		</script>
 	</head>
 	<body>

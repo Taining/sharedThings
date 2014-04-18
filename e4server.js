@@ -42,12 +42,17 @@ wss.on('connection', function(ws) {
 		console.log(JSON.stringify(Object.keys(worldArray)));
 
 		if (request['action'] == "update") {
-			worldArray[worldName] = request['world'];
+			// worldArray[worldName] = request['world'];
+			
+			var objectID = request['objectID'];
+			worldArray[worldName][objectID] = request['position'];
+			
 			wss.broadcast(message);
 		} else if (request['action'] == "save") {
 			worldArray[worldName] = request['world'];
 			wss.broadcastWorldsName();
 		}
+		
 	});
 });
 
