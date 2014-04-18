@@ -54,9 +54,14 @@
 			function displayWorlds(worldNames){
 				var html = "<h2>All worlds</h2>";
 				for(var name in worldNames){
-					html += "<li>" + worldNames[name] + "</li>";
+					html += "<li><a onclick='chooseWorld($(this));'>" + worldNames[name] + "</a></li>";
 				}
 				$("#world-list").html(html);
+			}
+
+			function chooseWorld(e){
+				worldName = e.html();
+				console.log(worldName);
 			}
 
 			function setupSocket(){
