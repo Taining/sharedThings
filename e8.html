@@ -3,12 +3,8 @@
 	<head>
 		<meta charset="utf-8" />
   		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Shared Things</title>
-
-		<!-- <link href="jquery-ui-1.10.4.custom/css/smoothness/jquery-ui-1.10.4.custom.css" rel="stylesheet"> ignore jquery ui styles, eventually we will use bootstrap styles -->
-
         <script src="bootstrap/js/jquery.min.js"></script> <!-- version of jquery for bootstrap -->
         <script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough of jquery ui for dragging, no more -->
         <script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ -->
@@ -30,11 +26,12 @@
 		<script>
 			var world = {};
 			var socket;
+			var worldName = "undefined";
 
 			function logDrag(event, ui){
-				//console.log(JSON.stringify(ui.position) + " " + event.target.id);
 				world[event.target.id] = ui.position;
-				socket.send(JSON.stringify(world)); 
+				var request = {'action': 'update', 'worldName': worldName, 'world': world};
+				socket.send(JSON.stringify(request)); 
 			}
 
 			function updateWorld(){
@@ -47,6 +44,33 @@
 				}
 			}
 
+			function saveWorld(){
+				worldName = $("#world-name").val();
+				var request = {'action': 'save', 'worldName': worldName, 'world': world};
+				socket.send(JSON.stringify(request));
+			}
+
+			function displayWorlds(){
+
+			}
+
+			function setupSocket(){
+				socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
+				socket.onopen = function (event) {
+  					
+				};
+				socket.onclose = function (event) {
+					alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
+				};
+				socket.onmessage = function (event) {
+					var message = JSON.parse(event.data);
+					if (message['worldName'] == worldName) {
+						world = message['world'];
+						updateWorld();
+					};
+				}
+			}
+
 			$(function() { 
 				$(".draggable").draggable({
     				containment: 'parent'
@@ -56,18 +80,7 @@
 					world[$(this).attr("id")] = $(this).position();
 				}); 
 				
-				//set up web socket
-				socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
-				socket.onopen = function (event) {
-  					
-				};
-				socket.onclose = function (event) {
-					alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
-				};
-				socket.onmessage = function (event) {
-					world = JSON.parse(event.data);
-					updateWorld();
-				}
+				setupSocket();
 
 				$("#world img").draggable(); 
 				$("#world img").on("dragstart", function(event, ui) { logDrag(event, ui); });
