@@ -55,15 +55,7 @@
 
 			}
 
-			$(function() { 
-				$(".draggable").draggable({
-    				containment: 'parent'
-				});
-
-				$(".draggable").each(function(key, value){
-					world[$(this).attr("id")] = $(this).position();
-				}); 
-				
+			function setupSocket(){
 				socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
 				socket.onopen = function (event) {
   					
@@ -73,11 +65,30 @@
 				};
 				socket.onmessage = function (event) {
 					var message = JSON.parse(event.data);
-					if (message['worldName'] == worldName) {
+					if (message['action'] = 'displayWorlds') {
+						var worldNames = message['worlds'];
+						var html = "";
+						for(var name in worldNames){
+							html += "<li>" + name + "</li>";
+						}
+						$("#world-list").html(html);
+					} else if (message['action'] == 'update' && message['worldName'] == worldName) {
 						world = message['world'];
 						updateWorld();
 					};
 				}
+			}
+
+			$(function() { 
+				$(".draggable").draggable({
+    				containment: 'parent'
+				});
+
+				$(".draggable").each(function(key, value){
+					world[$(this).attr("id")] = $(this).position();
+				}); 
+				
+				setupSocket();
 
 				$("#world img").draggable(); 
 				$("#world img").on("dragstart", function(event, ui) { logDrag(event, ui); });
