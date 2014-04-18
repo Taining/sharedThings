@@ -21,6 +21,10 @@
 				width: 500px;
 				margin: 0 auto;
 			}
+			#ttt-board {
+				position: relative;
+				margin: 0 auto;
+			}
 		</style>
 		<script src="config.js" ></script>
 		<script>
@@ -95,10 +99,10 @@
 				
 				setupSocket();
 
-				$("#world img").draggable(); 
-				$("#world img").on("dragstart", function(event, ui) { logDrag(event, ui); });
-				$("#world img").on("dragstop" , function(event, ui) { logDrag(event, ui); });
-				$("#world img").on("drag"     , function(event, ui) { logDrag(event, ui); });
+				$(".draggable").draggable(); 
+				$(".draggable").on("dragstart", function(event, ui) { logDrag(event, ui); });
+				$(".draggable").on("dragstop" , function(event, ui) { logDrag(event, ui); });
+				$(".draggable").on("drag"     , function(event, ui) { logDrag(event, ui); });
 			});
 		</script>
 	</head>
@@ -113,8 +117,8 @@
 			<img id="o2" src="images/o.gif" style="z-index:2;" class="draggable" />
 			<img id="o3" src="images/o.gif" style="z-index:2;" class="draggable" />
 			<img id="o4" src="images/o.gif" style="z-index:2;" class="draggable" />
-			<img id="o5" src="images/o.gif" style="z-index:2;" /class="draggable" >
-			<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" class="draggable" />
+			<img id="o5" src="images/o.gif" style="z-index:2;" class="draggable" />
+			<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" />
 		</div>
 		<div id="share-world">
 			<ul id="world-list"></ul>
