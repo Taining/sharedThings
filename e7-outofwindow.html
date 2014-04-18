@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+  		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>Shared Things</title>
+
+		<!-- <link href="jquery-ui-1.10.4.custom/css/smoothness/jquery-ui-1.10.4.custom.css" rel="stylesheet"> ignore jquery ui styles, eventually we will use bootstrap styles -->
+
+                <script src="bootstrap/js/jquery.min.js"></script> <!-- version of jquery for bootstrap -->
+                <script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough of jquery ui for dragging, no more -->
+                <script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ -->
+		<style>
+			.draggable { 
+				position: fixed;
+			} 
+			.element-x {
+				position: absolute;
+				top: 220px;
+			}
+			.element-o {
+				position: absolute;
+				top: 220px;
+				left: 4em;
+			}
+			#tttboard {
+				position: absolute;
+				top: 2em;
+			}
+			#message {
+				color: red;
+			}
+			
+			#window {
+				position: fixed;
+			}
+			.red-border-right {
+				border-style: solid;
+				border-color: red;
+				border-width: 0 10px 0 0;
+			}
+			.red-border-bottom {
+				border-style: solid;
+				border-color: red;
+				border-width: 0 0 10px 0;
+			}
+			.red-border {
+				border: solid 2px red;
+			}
+		</style>
+		<script src="config.js" ></script>
+		<script>
+			var world = {};
+			var canDrag = [];
+			
+			var socket;
+			function handleDrag(event, ui){
+				console.log(JSON.stringify(ui.position) + " " + event.target.id);
+				//world[event.target.id] = ui.position;
+				//socket.send(JSON.stringify(world)); 
+				
+				var objectID = event.target.id;				
+				var position = ui.position;
+				var request = {'action': 'update', 'objectID': objectID, 'position': ui.position};
+				socket.send(JSON.stringify(request)); 
+			}
+
+			function updateWholeWorld(){
+				for(var elementId in world){
+					var position = world[elementId];
+					$("#"+elementId).css({
+						'top': position["top"],
+						'left': position["left"]
+					});
+				}
+			}
+			
+			function updateWorld(message) {
+				var elementId = message['objectID'];
+				var position = message['position']
+				world[elementId] = message['position'];
+				
+				$("#"+elementId).css({
+					'top': position["top"],
+					'left': position["left"]
+				});
+				
+				checkOutOfWindowDragging(elementId, position);
+			}
+			
+			function checkOutOfWindowDragging(elementId, position) {
+				var top = position["top"];
+				var left = position["left"];
+				var width = $(window).width();
+				var height = $(window).height();
+				
+				if(left > width || top > height) {
+					$("#message").html("Someone is dragging outside of the window");
+		
+					setTimeout(function () {
+						$("#message").html("");
+					}, 1000);				
+				}
+				/*
+				if(left > width) {
+					var windowWidth = $(window).width();
+					var windowHeight = $(window).height();
+					
+					var flashWindowBorderInterval = setInterval(function() {
+						if(left < windowWidth && top < windowHeight) {
+							window.clearInterval(flashWindowBorderInterval);
+							window.clearInterval(flashElementBorderInterval);
+						}
+									
+						$("#window").css({
+							width: windowWidth - 20, // subtract twice the thickness
+							height: windowHeight - 20, // of the border from each dimension
+						});
+						$("#window").toggleClass('red-border-right');					
+					}, 2000);
+					
+					var flashElementBorderInterval = setInterval(function() {
+						$("#"+elementId).toggleClass('red-border');
+					}, 2000);
+					
+					setTimeout(function () {
+						window.clearInterval(flashWindowBorderInterval);
+						window.clearInterval(flashElementBorderInterval);
+						
+						// $("window").removeClass('red-border-right');
+						
+					}, 5000);		
+					
+				} else if(top > height) {
+					var flashInterval = setInterval(function() {
+						if(left < windowWidth && top < windowHeight) {
+							window.clearInterval(flashWindowBorderInterval);
+							window.clearInterval(flashElementBorderInterval);
+						}
+					
+						$("#"+elementId).toggleClass('red-border');
+						
+						$("#window").css({
+							width: $(window).width() - 30, // subtract twice the thickness
+							height: $(window).height() - 30, // of the border from each dimension
+						});
+						$("#window").toggleClass('red-border-bottom');
+					}, 1000);	
+					
+					setTimeout(function () {
+						window.clearInterval(flashInterval);
+					}, 5000);
+								
+				}
+				*/
+			}
+
+			$(function() { 
+				$(".draggable").each(function(key, value){
+					world[$(this).attr("id")] = $(this).position();
+				}); 
+				
+				//set up web socket
+				socket = new WebSocket("ws://localhost:" + port);
+				socket.onopen = function (event) {
+  					
+				};
+				socket.onclose = function (event) {
+					alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
+				};
+				socket.onmessage = function (event) {
+					var message = JSON.parse(event.data);
+					if(message['action'] == 'getWorld') {
+						world = message['world'];
+						updateWholeWorld();
+					} else if(message['action'] == 'update') {
+						updateWorld(message);
+					}
+				}
+
+				$(".draggable").draggable(); 
+				$(".draggable").on("dragstart", function(event, ui) { handleDrag(event, ui); });
+				$(".draggable").on("dragstop" , function(event, ui) { handleDrag(event, ui); });
+				$(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
+				
+				/*
+				$("#window").css({
+					width: $(window).width() - 30, // subtract twice the thickness
+					height: $(window).height() - 30, // of the border from each dimension
+					border: '10px solid red'
+				});
+				*/
+			});
+		</script>
+	</head>
+	<body>
+		<div id="window">
+		</div>
+		<div id="world">
+			<img id="x1" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+			<img id="x2" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+			<img id="x3" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+			<img id="x4" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+			<img id="x5" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+			<img id="o1" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+			<img id="o2" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+			<img id="o3" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+			<img id="o4" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+			<img id="o5" src="images/o.gif" style="z-index:2;" class="draggable element-o" >
+			<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" />
+		</div>
+		<div id="message">
+		
+		<div>
+	</body>
+</html>
