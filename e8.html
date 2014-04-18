@@ -67,9 +67,9 @@
 					var message = JSON.parse(event.data);
 					if (message['action'] = 'displayWorlds') {
 						var worldNames = message['worlds'];
-						var html = "";
+						var html = "<h2>All worlds</h2>";
 						for(var name in worldNames){
-							html += "<li>" + name + "</li>";
+							html += "<li>" + worldNames[name] + "</li>";
 						}
 						$("#world-list").html(html);
 					} else if (message['action'] == 'update' && message['worldName'] == worldName) {

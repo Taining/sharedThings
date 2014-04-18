@@ -15,7 +15,7 @@ wss.broadcast = function(data) {
 wss.broadcastWorldsName = function (){
 	var response = {'action': 'displayWorlds', 'worlds': Object.keys(worldArray)};
 	for (var i in this.clients) {
-		this.clients[i].send(response);
+		this.clients[i].send(JSON.stringify(response));
 	};
 }
 
