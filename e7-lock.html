@@ -60,6 +60,9 @@
 			
 			function handleDragStart(event, ui){
 				var objectID = event.target.id;
+				
+				console.log("Locked = " + locked[objectID]);
+				
 				if(locked[objectID]) {
 					$("#message").html("Someone else is dragging this");
 					return;
