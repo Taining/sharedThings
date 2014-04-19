@@ -148,6 +148,7 @@
             clientIndex = message['index'];
             navigator.geolocation.getCurrentPosition(success, error, options);
           } else if (message['action'] == 'updateLocations') {
+            console.log(JSON.stringify(message));
             //remove all markers
             for (var marker in markers){
               marker.setMap(null);
@@ -156,7 +157,8 @@
 
             //add new markers
             var locations = message['locations'];
-            for(var location in locations){
+            for(var key in locations){
+              var location = locations[key];
               location = new google.maps.LatLng(location.k,location.A);
               setMarker(location);
             }
