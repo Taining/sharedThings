@@ -55,6 +55,8 @@ wss.on('connection', function(ws) {
 	sendWorldsNameForNewClient(ws);
 	sendIndexForNewClient(ws);
 
+	console.log("client id is " + ws.id);
+
 	ws.on('message', function(message) {
 		var request = JSON.parse(message);
 
