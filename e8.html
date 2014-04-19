@@ -56,7 +56,7 @@
 			
 			function updateWorld(message) {
 				var elementId = message['objectID'];
-				var position = message['position']
+				var position = message['position'];
 				world[elementId] = message['position'];
 				
 				$("#"+elementId).css({
@@ -101,7 +101,10 @@
 					} else if (message['action'] == 'update' && message['worldName'] == worldName) {
 						// world = message['world'];
 						updateWorld(message);
-					};
+					} else if (message['action'] == 'updateWholeWorld') {
+						world = message['world'];
+						updateWholeWorld();
+					}
 				}
 			}
 
