@@ -143,10 +143,12 @@
 					} else if(message['action'] == 'update') {
 						updateWorld(message);
 					} else if(message['action'] == 'lock') {
-						locked[message['objectID']] = true;
+						var objectID = message['objectID'];
+						locked[objectID] = true;
 						$("#"+objectID).removeClass("draggable");
 					} else if(message['action'] == 'unlock') {
-						locked[message['objectID']] = false;
+						var objectID = message['objectID'];
+						locked[objectID] = false;
 						$("#"+objectID).addClass("draggable");
 					} else if(message['action'] == 'sendLockArray') {
 						locked = message['array'];
