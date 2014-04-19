@@ -36,8 +36,6 @@
 			var worldName = "Default";
 
 			function handleDrag(event, ui){
-				// world[event.target.id] = ui.position;
-				// var request = {'action': 'update', 'worldName': worldName, 'world': world};
 				var objectID = event.target.id;
 				var position = ui.position;
 				var request = {'action': 'update', 'worldName': worldName, 'objectID': objectID, 'position': ui.position};
@@ -82,7 +80,9 @@
 
 			function chooseWorld(e){
 				worldName = e.html();
-				console.log(worldName);
+				//request new world
+				var request = {'action': 'requestWorld', 'worldName': worldName};
+				socket.send(JSON.stringify(request));
 			}
 
 			function setupSocket(){
@@ -99,7 +99,6 @@
 						var worldNames = message['worlds'];
 						displayWorlds(worldNames);
 					} else if (message['action'] == 'update' && message['worldName'] == worldName) {
-						// world = message['world'];
 						updateWorld(message);
 					} else if (message['action'] == 'updateWholeWorld') {
 						world = message['world'];

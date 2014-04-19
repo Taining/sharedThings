@@ -7,7 +7,7 @@ wss.on('close', function() {
     console.log('disconnected');
 });
 
-wss.broadcast = function(data) {
+wss.broadcastObject = function(data) {
     for(var i in this.clients)
         this.clients[i].send(data);
 };
@@ -19,10 +19,9 @@ wss.broadcastWorldsName = function (){
 	};
 }
 
-function sendWorldForNewClient(ws){
-	console.log(JSON.stringify(worldArray['Default']));
-	if (worldArray['Default']) {
-		var response = {'action': 'updateWholeWorld', 'worldName': 'Default', 'world': worldArray['Default']};
+function sendWorld(ws, worldName){
+	if (worldArray[worldName]) {
+		var response = {'action': 'updateWholeWorld', 'worldName': worldName, 'world': worldArray[worldName]};
 		ws.send(JSON.stringify(response));
 	}
 }
@@ -33,14 +32,12 @@ function sendWorldsNameForNewClient(ws){
 }
 
 wss.on('connection', function(ws) {
-	sendWorldForNewClient(ws);
+	sendWorld(ws, 'Default');
 	sendWorldsNameForNewClient(ws);
 
 	ws.on('message', function(message) {
 		var request = JSON.parse(message);
 		var worldName = request['worldName'];
-		
-		//console.log(JSON.stringify(Object.keys(worldArray)));
 
 		if (request['action'] == "update") {
 			console.log(message);
@@ -50,6 +47,8 @@ wss.on('connection', function(ws) {
 		} else if (request['action'] == "save") {
 			worldArray[worldName] = request['world'];
 			wss.broadcastWorldsName();
+		} else if (request['action'] == "requestWorld") {
+			sendWorld(ws, worldName);
 		}
 		
 	});
