@@ -61,7 +61,6 @@
 		<script type="text/javascript">
 			var map;
 			var myLatlng;
-			var clientIndex;
 			var markers = [];
 			
 			var world = {};
@@ -94,7 +93,7 @@
 			function success(pos) {
 				var crd = pos.coords;
 				myLatlng = new google.maps.LatLng(crd.latitude,crd.longitude);
-				var request = {'action': 'setLocation', 'index': clientIndex, 'location': myLatlng};
+				var request = {'action': 'setLocation', 'location': myLatlng};
 				socket.send(JSON.stringify(request));
 				console.log(JSON.stringify(request));
 			};
@@ -149,13 +148,11 @@
 			function setupSocket(){
 				socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
 				socket.onopen = function (event) {
-			
+			     navigator.geolocation.getCurrentPosition(success, error, options);
 				};
 		
 				socket.onclose = function (event) {
 					alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
-					var request = {'action': 'deleteLocation', 'index': clientIndex};
-					socket.send(JSON.stringify(request));
 				};
 
 				socket.onmessage = function (event) {
@@ -169,9 +166,6 @@
 					} else if (message['action'] == 'updateWholeWorld') {
 						world = message['world'];
 						updateWholeWorld();
-					} else if (message['action'] == 'setIndex'){
-						clientIndex = message['index'];
-						navigator.geolocation.getCurrentPosition(success, error, options);
 					} else if (message['action'] == 'updateLocations') {
 						console.log(JSON.stringify(message));
 						//remove all markers
