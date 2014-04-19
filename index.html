@@ -18,6 +18,7 @@
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 		<!-- Include all compiled plugins (below), or include individual files as needed -->
 		<script src="config.js" ></script>
+		<script src="shake.js"></script>
 		<script type="text/javascript"
 			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtWOvqQI2BRkYDh7EW07_vOZIRFRC7qTg&sensor=false">
 		</script>
@@ -340,6 +341,10 @@
                                      socket.send(JSON.stringify(request));
                                      // location.reload();
             }
+            
+			function shakeEventDidOccur () {
+				restartGame();
+			}
         
             function getDefaultWorld() {
                 console.log("client get default world, propose: " + JSON.stringify(world));
