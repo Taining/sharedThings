@@ -9,7 +9,9 @@
         <script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough of jquery ui for dragging, no more -->
         <script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ -->
 		<style>
-			.draggable { position: relative; }
+			.draggable { 
+				position: absolute; 
+			}
 			#world {
 				position: relative;
 				height: 500px;
@@ -21,11 +23,12 @@
 				width: 500px;
 				margin: 0 auto;
 			}
-			#ttt-board {
+			#tttboard {
 				position: relative;
 				width: 176px;
 				height: 189px;
-				margin: 0 auto;
+				margin-top: 50px;
+				margin-left: 100px;
 			}
 		</style>
 		<script src="config.js" ></script>
@@ -35,12 +38,16 @@
 			var worldName = "Default";
 
 			function logDrag(event, ui){
-				world[event.target.id] = ui.position;
+				world[event.target.id] = ui.position({
+					within: "#world"
+				});
 				var request = {'action': 'update', 'worldName': worldName, 'world': world};
-				socket.send(JSON.stringify(request)); 
+				socket.send(JSON.stringify(request));
+				//console.log(JSON.stringify(request)); 
 			}
 
 			function updateWorld(){
+				//console.log(JSON.stringify(world));
 				for(var elementId in world){
 					var position = world[elementId];
 					$("#"+elementId).css({
@@ -100,10 +107,14 @@
 				});
 
 				$(".draggable").each(function(key, value){
-					world[$(this).attr("id")] = $(this).position();
+					world[$(this).attr("id")] = $(this).position({
+						within: "#world"
+					});
 				}); 
 				
 				setupSocket();
+
+				console.log(JSON.stringify(world));
 
 				$(".draggable").draggable(); 
 				$(".draggable").on("dragstart", function(event, ui) { logDrag(event, ui); });
