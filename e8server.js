@@ -40,14 +40,12 @@ wss.on('connection', function(ws) {
 		var request = JSON.parse(message);
 		var worldName = request['worldName'];
 		
-		console.log(JSON.stringify(Object.keys(worldArray)));
+		//console.log(JSON.stringify(Object.keys(worldArray)));
 
 		if (request['action'] == "update") {
-			// worldArray[worldName] = request['world'];
-			
+			console.log(message);
 			var objectID = request['objectID'];
 			worldArray[worldName][objectID] = request['position'];
-			
 			wss.broadcast(message);
 		} else if (request['action'] == "save") {
 			worldArray[worldName] = request['world'];
