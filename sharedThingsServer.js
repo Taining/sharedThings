@@ -3,7 +3,8 @@ var config = require('./config_node.js');
 var WebSocketServer = require('ws').Server, wss = new WebSocketServer({port: config.port});
 var worldArray = {'Default': {}};
 var locationArray = {};
-var clientIndex = 0;
+var connections = {};
+var connectionCounter = 0;
 
 wss.on('close', function() {
     console.log('disconnected');
@@ -44,18 +45,15 @@ function sendWorldsNameForNewClient(ws){
 	ws.send(JSON.stringify(response));
 }
 
-function sendIndexForNewClient(ws){
-	var response = {'action': 'setIndex', 'index': clientIndex};
-	ws.send(JSON.stringify(response));
-	clientIndex++;
+function setIndexForNewClient(ws){
+	ws.id = connectionCounter++;
+	connections[ws.id] = ws;
 }
 
 wss.on('connection', function(ws) {
 	sendWorld(ws, 'Default');
 	sendWorldsNameForNewClient(ws);
-	sendIndexForNewClient(ws);
-
-	console.log(ws);
+	setIndexForNewClient(ws);
 
 	ws.on('message', function(message) {
 		var request = JSON.parse(message);
@@ -73,14 +71,16 @@ wss.on('connection', function(ws) {
 			var worldName = request['worldName'];
 			sendWorld(ws, worldName);
 		} else if (request['action'] == 'setLocation'){
-			var index = request['index'];
 			var location = request['location'];
-			locationArray[index] = location;
+			locationArray[ws.id] = location;
 			wss.broadcastLocations();
-		} else if(message['action'] == 'deleteLocation'){
-			console.log(message);
 		}
 		
+	});
+
+	ws.on('close', function(reasonCode, description) {
+		delete connections[ws.id];
+		delete locationArray[ws.id];
 	});
 });
 
