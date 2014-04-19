@@ -19,7 +19,7 @@
   <!-- Include all compiled plugins (below), or include individual files as needed -->
   <script src="config.js" ></script>
   <script type="text/javascript"
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtWOvqQI2BRkYDh7EW07_vOZIRFRC7qTg&sensor=true">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtWOvqQI2BRkYDh7EW07_vOZIRFRC7qTg&sensor=false">
   </script>
 
   <style>
@@ -67,13 +67,11 @@
         maximumAge: 0
       };
 
-      function setMarkers(locations){
-        for (var location in locations){
-          var marker = new google.maps.Marker({
-            position: location,
-          });
-          marker.setMap(map);
-        }
+      function setMarker(location){
+        var marker = new google.maps.Marker({
+          position: location,
+        });
+        marker.setMap(map);
       }
 
       function success(pos) {
@@ -81,7 +79,6 @@
         myLatlng = new google.maps.LatLng(crd.latitude,crd.longitude);
         var request = {'action': 'setLocation', 'index': clientIndex, 'location': myLatlng};
         socket.send(JSON.stringify(request));
-        console.log(JSON.stringify(request));
       };
 
       function error(err) {
@@ -148,10 +145,11 @@
             navigator.geolocation.getCurrentPosition(success, error, options);
           } else if (message['action'] == 'updateLocations') {
             var locations = message['locations'];
-            setMarkers(locations);
+            
           } else if (message['action'] == 'setLocation'){
             var location = message['location'];
-            setMarkers([location]);
+            location = new google.maps.LatLng(location.k,location.A);
+            setMarker(location);
           }
         }
       }
