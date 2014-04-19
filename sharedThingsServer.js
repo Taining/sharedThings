@@ -75,12 +75,12 @@ wss.on('connection', function(ws) {
 			locationArray[ws.id] = location;
 			wss.broadcastLocations();
 		}
-		
 	});
 
 	ws.on('close', function(reasonCode, description) {
 		delete connections[ws.id];
 		delete locationArray[ws.id];
+		wss.broadcastLocations();
 	});
 });
 
