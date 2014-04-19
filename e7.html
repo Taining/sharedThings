@@ -25,6 +25,10 @@
 				top: 220px;
 				left: 4em;
 			}
+			#restartButton {
+				position: absolute;
+				top: 280px;				
+			}
 			#tttboard {
 				position: absolute;
 				top: 2em;
@@ -138,6 +142,19 @@
 				var request = {'action': 'getLockArray', 'proposedArray': locked};
 				socket.send(JSON.stringify(request)); 
 			}
+			
+			function restartGame() {
+				console.log("restart");
+				world = {};
+				updateWholeWorld();
+				$(".draggable").each(function() {
+					holdLock[$(this).attr("id")] = false;
+					locked[$(this).attr("id")] = false;
+				});
+				var request = {'action': 'resetWorld', 'lockedArray': locked};
+				socket.send(JSON.stringify(request));
+				location.reload();
+			}
 
 			$(function() { 
 				$(".draggable").each(function(key, value){
@@ -145,7 +162,7 @@
 				}); 
 				
 				//set up web socket
-				socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
+				socket = new WebSocket("ws://localhost:" + port);
 				
 				socket.onopen = function (event) {
   					$(".draggable").each(function() {
@@ -176,6 +193,16 @@
 						$("#"+objectID).draggable( 'enable' );
 					} else if(message['action'] == 'sendLockArray') {
 						locked = message['array'];
+					} else if(message['action'] == 'resetWorld') {
+						world = {};
+						locked = message['lockedArray'];
+						
+						$(".draggable").draggable( 'enable' );
+						$(".draggable").each(function(key, value){
+							holdLock[$(this).attr("id")] = false;
+						}); 
+						
+						location.reload();
 					}
 				}
 
@@ -183,6 +210,7 @@
 				$(".draggable").on("dragstart", function(event, ui) { handleDragStart(event, ui); });
 				$(".draggable").on("dragstop" , function(event, ui) { handleDragEnd(event, ui); });
 				$(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
+			
 			});
 		</script>
 	</head>
@@ -203,5 +231,6 @@
 		<div id="message">
 		
 		</div>
+		<button id="restartButton" onclick="restartGame()">Restart</button>
 	</body>
 </html>

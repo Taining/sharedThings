@@ -53,7 +53,10 @@ wss.on('connection', function(ws) {
 			var message = {'action': 'sendLockArray', 'array': locked};
 			ws.send(JSON.stringify(message));
 			
+		} else if(request['action'] == "resetWorld") {
+			world = {};
+			locked = request['lockedArray'];
+			wss.broadcast(message);
 		}
-		
 	});
 });
