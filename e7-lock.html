@@ -62,6 +62,7 @@
 				}
 				holdLock[objectID] = true;
 				var request = {'action': 'lock', 'objectID': objectID};
+				socket.send(JSON.stringify(request));
 				
 				handleDrag(event, ui);
 			}
@@ -74,7 +75,8 @@
 					return;
 				}
 				
-				var request = {'action': 'unlock', 'objectID': objectID};			
+				var request = {'action': 'unlock', 'objectID': objectID};	
+				socket.send(JSON.stringify(request)); 		
 				
 				handleDrag(event, ui);
 				holdLock[objectID] = false;
