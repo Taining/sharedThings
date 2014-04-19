@@ -1,7 +1,7 @@
 var config = require('./config_node.js');
 
 var WebSocketServer = require('ws').Server, wss = new WebSocketServer({port: config.port});
-var worldArray = {'Default': ''};
+var worldArray = {'Default': {}};
 
 wss.on('close', function() {
     console.log('disconnected');
