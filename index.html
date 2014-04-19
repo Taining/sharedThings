@@ -169,8 +169,8 @@
 					} else if (message['action'] == 'updateLocations') {
 						console.log(JSON.stringify(message));
 						//remove all markers
-						for (var marker in markers){
-							marker.setMap(null);
+						for (var key in markers){
+							markers[key].setMap(null);
 						}
 						markers = [];
 
