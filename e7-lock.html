@@ -145,11 +145,11 @@
 					} else if(message['action'] == 'lock') {
 						var objectID = message['objectID'];
 						locked[objectID] = true;
-						$("#"+objectID).removeClass("draggable");
+						$("#"+objectID).draggable( 'disable' );
 					} else if(message['action'] == 'unlock') {
 						var objectID = message['objectID'];
 						locked[objectID] = false;
-						$("#"+objectID).addClass("draggable");
+						$("#"+objectID).draggable( 'enable' );
 					} else if(message['action'] == 'sendLockArray') {
 						locked = message['array'];
 					}
