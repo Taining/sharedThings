@@ -22,9 +22,10 @@ wss.broadcastWorldsName = function (){
 }
 
 wss.broadcastLocations = function(){
-	var locations = $.map(locationArray,function(v){
- 		return v;
-	});
+	var locations [];
+	for (var key in locationArray){
+		locations.push(locationArray[key]);
+	}
 	var response = {'action': 'updateLocations', 'locations': locations};
 	ws.send(JSON.stringify(response));
 }
