@@ -24,6 +24,16 @@
 
 		<style>
 			.draggable { position: absolute; }
+			.element-x {
+				position: absolute;
+				top: 220px;
+			}
+			.element-o {
+				position: absolute;
+				top: 220px;
+				left: 4em;
+			}
+			
 			html { height: 100% }
 			body { height: 100%; margin: 0; padding: 0 }
 			#map-canvas { 
@@ -128,6 +138,13 @@
 				}
 				$("#world-list").html(html);
 			}
+			
+			function chooseWorld(e){
+				worldName = e.html();
+				//request new world
+				var request = {'action': 'requestWorld', 'worldName': worldName};
+				socket.send(JSON.stringify(request));
+			}
 
 			function setupSocket(){
 				socket = new WebSocket("ws://localhost:" + port);
@@ -181,6 +198,13 @@
 				}
 				$("#world-list").html(html);		
 			}
+			
+			function saveWorld(){
+				worldName = $("#world-name").val();
+				var request = {'action': 'save', 'worldName': worldName, 'world': world};
+
+				socket.send(JSON.stringify(request));
+			}
 
 			$(function() { 
 				initialize();
@@ -220,7 +244,7 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="#">Brand</a>
+					<a class="navbar-brand" href="#">Dragging in Your World</a>
 				</div>
 
 				<!-- Collect the nav links, forms, and other content for toggling -->
@@ -235,7 +259,7 @@
 					</ul>
 					<form class="navbar-form navbar-left">
 						<div class="form-group">
-							<input type="text" class="form-control" placeholder="Search">
+							<input type="text" id="world-name" class="form-control" placeholder="Your world name">
 						</div>
 						<button class="btn btn-default" onclick="saveWorld()">Save new world</button>
 					</form>
@@ -259,17 +283,17 @@
 			<div class="row">
 				<div class="col-md-6">
 					<div id="world">
-						<img id="x1" src="images/x.gif" style="z-index:2;" class="draggable" />
-						<img id="x2" src="images/x.gif" style="z-index:2;" class="draggable" />
-						<img id="x3" src="images/x.gif" style="z-index:2;" class="draggable" />
-						<img id="x4" src="images/x.gif" style="z-index:2;" class="draggable" />
-						<img id="x5" src="images/x.gif" style="z-index:2;" class="draggable" />
-						<img id="o1" src="images/o.gif" style="z-index:2;" class="draggable" />
-						<img id="o2" src="images/o.gif" style="z-index:2;" class="draggable" />
-						<img id="o3" src="images/o.gif" style="z-index:2;" class="draggable" />
-						<img id="o4" src="images/o.gif" style="z-index:2;" class="draggable" />
-						<img id="o5" src="images/o.gif" style="z-index:2;" /class="draggable" >
-						<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" class="draggable" />
+						<img id="x1" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+						<img id="x2" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+						<img id="x3" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+						<img id="x4" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+						<img id="x5" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+						<img id="o1" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+						<img id="o2" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+						<img id="o3" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+						<img id="o4" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+						<img id="o5" src="images/o.gif" style="z-index:2;" class="draggable element-o" >
+						<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" />
 					</div>
 				</div>
 				<div id="map-canvas" class="col-md-6"></div>
