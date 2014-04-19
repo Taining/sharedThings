@@ -40,6 +40,7 @@ wss.on('connection', function(ws) {
 		var worldName = request['worldName'];
 
 		if (request['action'] == "update") {
+			console.log(message);
 			var objectID = request['objectID'];
 			worldArray[worldName][objectID] = request['position'];
 			wss.broadcastObject(message);

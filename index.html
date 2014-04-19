@@ -49,10 +49,12 @@
 
   <script type="text/javascript">
       var map;
+      var myLatlng;
+      var clientIndex;
       function initialize() {
         var mapOptions = {
-          center: new google.maps.LatLng(1.294451, 103.773707),
-          zoom: 18
+          center: new google.maps.LatLng(1.366949, 103.814003),
+          zoom: 11
         };
         map = new google.maps.Map(document.getElementById("map-canvas"),
           mapOptions);
@@ -64,18 +66,18 @@
         maximumAge: 0
       };
 
+      function setMarkers(locations){
+        for (var location in locations){
+          var marker = new google.maps.Marker({
+            position: location,
+          });
+          marker.setMap(map);
+        }
+      }
+
       function success(pos) {
         var crd = pos.coords;
-        var myLatlng = new google.maps.LatLng(crd.latitude,crd.longitude);
-        var marker = new google.maps.Marker({
-          position: myLatlng,
-          title:"Hello World!"
-        });
-        marker.setMap(map);
-        console.log('Your current position is:');
-        console.log('Latitude : ' + crd.latitude);
-        console.log('Longitude: ' + crd.longitude);
-        console.log('More or less ' + crd.accuracy + ' meters.');
+        myLatlng = new google.maps.LatLng(crd.latitude,crd.longitude);
       };
 
       function error(err) {
@@ -86,9 +88,42 @@
         console.log(JSON.stringify(ui.position) + " " + event.target.id); 
       }
 
+      function setupSocket(){
+        socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
+        socket.onopen = function (event) {
+            
+        };
+        
+        socket.onclose = function (event) {
+          alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
+          var request = {'action': 'deleteLocation', 'index': clientIndex};
+          socket.send(JSON.stringify(request));
+        };
+
+        socket.onmessage = function (event) {
+          var message = JSON.parse(event.data);
+          if (message['action'] == 'displayWorlds') {
+            var worldNames = message['worlds'];
+            displayWorlds(worldNames);
+          } else if (message['action'] == 'update' && message['worldName'] == worldName) {
+            updateWorld(message);
+          } else if (message['action'] == 'updateWholeWorld') {
+            world = message['world'];
+            updateWholeWorld();
+          } else if (message['action'] == 'setIndex'){
+            clientIndex = message['index'];
+            var request = {'action': 'setLocation', 'index': clientIndex, 'location': myLatlng};
+            socket.send(JSON.stringify(request));
+          } else if (message['action'] == 'updateLocations') {
+
+          }
+        }
+      }
+
       $(function() { 
         initialize();
         navigator.geolocation.getCurrentPosition(success, error, options);
+        setupSocket();
 
         $("#world img").draggable(); 
         $("#world img").on("dragstart", function(event, ui) { logDrag(event, ui); });
