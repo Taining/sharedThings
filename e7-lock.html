@@ -144,8 +144,10 @@
 						updateWorld(message);
 					} else if(message['action'] == 'lock') {
 						locked[message['objectID']] = true;
+						$("#"+objectID).removeClass("draggable");
 					} else if(message['action'] == 'unlock') {
 						locked[message['objectID']] = false;
+						$("#"+objectID).addClass("draggable");
 					} else if(message['action'] == 'sendLockArray') {
 						locked = message['array'];
 					}
