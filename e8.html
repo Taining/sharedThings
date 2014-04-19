@@ -30,6 +30,7 @@
 				margin-top: 50px;
 				margin-left: 100px;
 			}
+
 		</style>
 		<script src="config.js" ></script>
 		<script>
@@ -44,8 +45,7 @@
 				console.log(JSON.stringify(request)); 
 			}
 
-			function updateWorld(){
-				//console.log(JSON.stringify(world));
+			function updateWholeWorld(){
 				for(var elementId in world){
 					var position = world[elementId];
 					$("#"+elementId).css({
@@ -53,6 +53,17 @@
 						'left': position["left"]
 					});
 				}
+			}
+			
+			function updateWorld(message) {
+				var elementId = message['objectID'];
+				var position = message['position']
+				world[elementId] = message['position'];
+				
+				$("#"+elementId).css({
+					'top': position["top"],
+					'left': position["left"]
+				});
 			}
 
 			function saveWorld(){
@@ -117,6 +128,7 @@
 				$(".draggable").on("dragstop" , function(event, ui) { logDrag(event, ui); });
 				$(".draggable").on("drag"     , function(event, ui) { logDrag(event, ui); });
 			});
+			
 		</script>
 	</head>
 	<body>

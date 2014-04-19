@@ -2,6 +2,7 @@ var config = require('./config_node.js');
 
 var WebSocketServer = require('ws').Server, wss = new WebSocketServer({port: config.port});
 var world = {};
+var locked = [];
 
 wss.on('close', function() {
     console.log('disconnected');
@@ -32,6 +33,26 @@ wss.on('connection', function(ws) {
 			world[objectID] = request['position'];
 			
 			wss.broadcast(message);
+			
+		} else if(request['action'] == "lock") {
+			var objectID = 	request['objectID'];
+			locked[objectID] = true;
+			wss.broadcast(message);
+			
+		} else if(request['action'] == "unlock") {
+			var objectID = 	request['objectID'];
+			locked[objectID] = false;
+			wss.broadcast(message);
+			
+		} else if(request['action'] == "getLockArray") {
+			if(locked.length == 0) {
+				// first client
+				locked = request['proposedArray'];
+				return;
+			}
+			var message = {'action': 'sendLockArray', 'array': locked};
+			ws.send(JSON.stringify(message));
+			
 		}
 		
 	});
