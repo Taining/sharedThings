@@ -74,6 +74,7 @@
           position: location,
         });
         marker.setMap(map);
+        markers.push(marker);
       }
 
       function success(pos) {
@@ -148,17 +149,17 @@
             navigator.geolocation.getCurrentPosition(success, error, options);
           } else if (message['action'] == 'updateLocations') {
             //remove all markers
+            for (var marker in markers){
+              marker.setMap(null);
+            }
+            markers = [];
 
+            //add new markers
             var locations = message['locations'];
             for(var location in locations){
               location = new google.maps.LatLng(location.k,location.A);
               setMarker(location);
             }
-          } else if (message['action'] == 'setLocation'){
-            var location = message['location'];
-            location = new google.maps.LatLng(location.k, location.A);
-            setMarker(location);
-            console.log(JSON.stringify(location));
           }
         }
       }

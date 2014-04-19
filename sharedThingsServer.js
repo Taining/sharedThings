@@ -21,6 +21,14 @@ wss.broadcastWorldsName = function (){
 	};
 }
 
+wss.broadcastLocations = function(){
+	var locations = $.map(locationArray,function(v){
+ 		return v;
+	});
+	var response = {'action': 'updateLocations', 'locations': locations};
+	ws.send(JSON.stringify(response));
+}
+
 function sendWorld(ws, worldName){
 	if (worldArray[worldName]) {
 		var response = {'action': 'updateWholeWorld', 'worldName': worldName, 'world': worldArray[worldName]};
@@ -37,14 +45,6 @@ function sendIndexForNewClient(ws){
 	var response = {'action': 'setIndex', 'index': clientIndex};
 	ws.send(JSON.stringify(response));
 	clientIndex++;
-}
-
-function sendLocationsForNewClient(ws){
-	var locations = $.map(locationArray,function(v){
- 		return v;
-	});
-	var response = {'action': 'updateLocations', 'locations': locations};
-	ws.send(JSON.stringify(response));
 }
 
 wss.on('connection', function(ws) {
@@ -71,7 +71,7 @@ wss.on('connection', function(ws) {
 			var index = request['index'];
 			var location = request['location'];
 			locationArray[index] = location;
-			wss.broadcast(message);
+			wss.broadcastLocations();
 		}
 		
 	});
