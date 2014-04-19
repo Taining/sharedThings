@@ -3,8 +3,6 @@ var config = require('./config_node.js');
 var WebSocketServer = require('ws').Server, wss = new WebSocketServer({port: config.port});
 var worldArray = {'Default': {}};
 
-var locked = {'Default': []};
-
 wss.on('close', function() {
     console.log('disconnected');
 });
@@ -19,13 +17,11 @@ wss.broadcastWorldsName = function (){
 	for (var i in this.clients) {
 		this.clients[i].send(JSON.stringify(response));
 	};
-};
+}
 
 function sendWorld(ws, worldName){
-	if(!worldArray[worldName]) console.log("undefined world");
 	if (worldArray[worldName]) {
-		console.log("update whole world: "+worldName);
-		var response = {'action': 'updateWholeWorld', 'world': worldArray[worldName], 'locked':locked[worldName]};
+		var response = {'action': 'updateWholeWorld', 'worldName': worldName, 'world': worldArray[worldName]};
 		ws.send(JSON.stringify(response));
 	}
 }
@@ -50,37 +46,9 @@ wss.on('connection', function(ws) {
 			wss.broadcastObject(message);
 		} else if (request['action'] == "save") {
 			worldArray[worldName] = request['world'];
-			locked[worldName] = request['locked'];
 			wss.broadcastWorldsName();
 		} else if (request['action'] == "requestWorld") {
 			sendWorld(ws, worldName);
-			
-		} else if(request['action'] == "lock") {
-			var worldName = request['worldName'];
-			var objectID = 	request['objectID'];
-			locked[worldName][objectID] = true;
-			wss.broadcastObject(message);
-			
-		} else if(request['action'] == "unlock") {
-			var worldName = request['worldName'];
-			var objectID = 	request['objectID'];
-			locked[worldName][objectID] = false;
-			wss.broadcastObject(message);
-			
-		} else if(request['action'] == "getLockArray") {
-			if(locked['Default'].length == 0) {
-				// first client
-				locked['Default'] = request['proposedArray'];
-				return;
-			}
-			var message = {'action': 'sendLockArray', 'array': locked['Default']};
-			ws.send(JSON.stringify(message));
-			
-		} else if(request['action'] == "resetWorld") {
-			var worldName = request['worldName'];
-			worldArray[worldName] = {};
-			locked[worldName] = request['lockedArray'];
-			wss.broadcastObject(message);
 		}
 		
 	});
