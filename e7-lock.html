@@ -45,6 +45,10 @@
 				
 				var objectID = event.target.id;
 				
+				console.log("objectID: " + objectID);
+				console.log("locked[objectID]: " + locked[objectID]);
+				console.log("holdLock[objectID]: " + holdLock[objectID]);
+				
 				if(locked[objectID] && !holdLock[objectID]) {
 					return;
 				}
