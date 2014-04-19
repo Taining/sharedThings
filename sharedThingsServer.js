@@ -75,6 +75,8 @@ wss.on('connection', function(ws) {
 			var location = request['location'];
 			locationArray[index] = location;
 			wss.broadcastLocations();
+		} else if(message['action'] == 'deleteLocation'){
+			console.log(message);
 		}
 		
 	});
