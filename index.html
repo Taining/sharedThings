@@ -52,6 +52,8 @@
       var map;
       var myLatlng;
       var clientIndex;
+      var markers = [];
+
       function initialize() {
         var mapOptions = {
           center: new google.maps.LatLng(1.366949, 103.814003),
@@ -67,17 +69,17 @@
         maximumAge: 0
       };
 
-      function setMarker(location){
-        var marker = new google.maps.Marker({
-          position: location,
-        });
+      function setMarker(marker){
         marker.setMap(map);
       }
 
       function success(pos) {
         var crd = pos.coords;
         myLatlng = new google.maps.LatLng(crd.latitude,crd.longitude);
-        var request = {'action': 'setLocation', 'index': clientIndex, 'location': myLatlng};
+        var marker = new google.maps.Marker({
+          position: location,
+        });
+        var request = {'action': 'setMarker', 'index': clientIndex, 'marker': myLatlng};
         socket.send(JSON.stringify(request));
       };
 
@@ -144,12 +146,17 @@
             clientIndex = message['index'];
             navigator.geolocation.getCurrentPosition(success, error, options);
           } else if (message['action'] == 'updateLocations') {
+            //remove all markers
+
             var locations = message['locations'];
-            
-          } else if (message['action'] == 'setLocation'){
-            var location = message['location'];
-            location = new google.maps.LatLng(location.k,location.A);
-            setMarker(location);
+            for(var location in locations){
+              location = new google.maps.LatLng(location.k,location.A);
+              setMarker(location);
+            }
+          } else if (message['action'] == 'setMarker'){
+            var marker = message['marker'];
+            setMarker(marker);
+            console.log(JSON.stringify(marker));
           }
         }
       }
