@@ -27,7 +27,9 @@ wss.broadcastLocations = function(){
 		locations.push(locationArray[key]);
 	}
 	var response = {'action': 'updateLocations', 'locations': locations};
-	ws.send(JSON.stringify(response));
+	for (var i in this.clients) {
+		this.clients[i].send(JSON.stringify(response));
+	};
 }
 
 function sendWorld(ws, worldName){
