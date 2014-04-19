@@ -65,6 +65,11 @@
 				
 				if(locked[objectID]) {
 					$("#message").html("Someone else is dragging this");
+					
+					setTimeout(function () {
+						$("#message").html("");
+					}, 2000);
+					
 					return;
 				}
 				holdLock[objectID] = true;
