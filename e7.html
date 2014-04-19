@@ -17,21 +17,27 @@
 				position: fixed;
 			} 
 			.element-x {
-			
+				position: absolute;
+				top: 220px;
 			}
 			.element-o {
 				position: absolute;
+				top: 220px;
 				left: 4em;
 			}
 			#tttboard {
 				position: absolute;
-				top: 4em;
+				top: 2em;
+			}
+			#message {
+				color: red;
 			}
 		</style>
 		<script src="config.js" ></script>
 		<script>
 			var world = {};
-			var canDrag = [];
+			var locked = [];	// array of boolean
+			var holdLock = [];	// array of boolean
 			
 			var socket;
 			function handleDrag(event, ui){
@@ -39,10 +45,55 @@
 				//world[event.target.id] = ui.position;
 				//socket.send(JSON.stringify(world)); 
 				
-				var objectID = event.target.id;				
+				var objectID = event.target.id;
+				
+				console.log("objectID: " + objectID);
+				console.log("locked[objectID]: " + locked[objectID]);
+				console.log("holdLock[objectID]: " + holdLock[objectID]);
+				
+				if(locked[objectID] && !holdLock[objectID]) {
+					return;
+				}
+				
 				var position = ui.position;
 				var request = {'action': 'update', 'objectID': objectID, 'position': ui.position};
 				socket.send(JSON.stringify(request)); 
+			}
+			
+			function handleDragStart(event, ui){
+				var objectID = event.target.id;
+				
+				console.log("Locked = " + locked[objectID]);
+				
+				if(locked[objectID]) {
+					$("#message").html("Someone else is dragging this");
+					
+					setTimeout(function () {
+						$("#message").html("");
+					}, 2000);
+					
+					return;
+				}
+				holdLock[objectID] = true;
+				var request = {'action': 'lock', 'objectID': objectID};
+				socket.send(JSON.stringify(request));
+				
+				handleDrag(event, ui);
+			}
+			
+			function handleDragEnd(event, ui){
+				var objectID = event.target.id;	
+				
+				if(locked[objectID] && !holdLock[objectID]) {
+					$("#message").html("why");
+					return;
+				}
+				
+				var request = {'action': 'unlock', 'objectID': objectID};	
+				socket.send(JSON.stringify(request)); 		
+				
+				handleDrag(event, ui);
+				holdLock[objectID] = false;
 			}
 
 			function updateWholeWorld(){
@@ -64,6 +115,28 @@
 					'top': position["top"],
 					'left': position["left"]
 				});
+				
+				checkOutOfWindowDragging(elementId, position);
+			}
+			
+			function checkOutOfWindowDragging(elementId, position) {
+				var top = position["top"];
+				var left = position["left"];
+				var width = $(window).width();
+				var height = $(window).height();
+				
+				if(left > width || top > height) {
+					$("#message").html("Someone is dragging outside of the window");
+		
+					setTimeout(function () {
+						$("#message").html("");
+					}, 1000);				
+				}
+			}
+
+			function getLockArray() {
+				var request = {'action': 'getLockArray', 'proposedArray': locked};
+				socket.send(JSON.stringify(request)); 
 			}
 
 			$(function() { 
@@ -72,13 +145,20 @@
 				}); 
 				
 				//set up web socket
-				socket = new WebSocket("ws://localhost:" + port);
+				socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
+				
 				socket.onopen = function (event) {
-  					
+  					$(".draggable").each(function() {
+  						holdLock[$(this).attr("id")] = false;
+  						locked[$(this).attr("id")] = false;
+  					});
+  					getLockArray();
 				};
+				
 				socket.onclose = function (event) {
 					alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
 				};
+				
 				socket.onmessage = function (event) {
 					var message = JSON.parse(event.data);
 					if(message['action'] == 'getWorld') {
@@ -86,12 +166,22 @@
 						updateWholeWorld();
 					} else if(message['action'] == 'update') {
 						updateWorld(message);
+					} else if(message['action'] == 'lock') {
+						var objectID = message['objectID'];
+						locked[objectID] = true;
+						$("#"+objectID).draggable( 'disable' );
+					} else if(message['action'] == 'unlock') {
+						var objectID = message['objectID'];
+						locked[objectID] = false;
+						$("#"+objectID).draggable( 'enable' );
+					} else if(message['action'] == 'sendLockArray') {
+						locked = message['array'];
 					}
 				}
 
 				$(".draggable").draggable(); 
-				$(".draggable").on("dragstart", function(event, ui) { handleDrag(event, ui); });
-				$(".draggable").on("dragstop" , function(event, ui) { handleDrag(event, ui); });
+				$(".draggable").on("dragstart", function(event, ui) { handleDragStart(event, ui); });
+				$(".draggable").on("dragstop" , function(event, ui) { handleDragEnd(event, ui); });
 				$(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
 			});
 		</script>
@@ -109,6 +199,9 @@
 			<img id="o4" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
 			<img id="o5" src="images/o.gif" style="z-index:2;" class="draggable element-o" >
 			<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" />
+		</div>
+		<div id="message">
+		
 		</div>
 	</body>
 </html>
