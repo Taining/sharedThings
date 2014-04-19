@@ -69,18 +69,19 @@
         maximumAge: 0
       };
 
-      function setMarker(marker){
+      function setMarker(location){
+        var marker = new google.maps.Marker({
+          position: location,
+        });
         marker.setMap(map);
       }
 
       function success(pos) {
         var crd = pos.coords;
         myLatlng = new google.maps.LatLng(crd.latitude,crd.longitude);
-        var marker = new google.maps.Marker({
-          position: location,
-        });
-        var request = {'action': 'setMarker', 'index': clientIndex, 'marker': myLatlng};
+        var request = {'action': 'setLocation', 'index': clientIndex, 'location': myLatlng};
         socket.send(JSON.stringify(request));
+        console.log(JSON.stringify(request));
       };
 
       function error(err) {
@@ -153,10 +154,11 @@
               location = new google.maps.LatLng(location.k,location.A);
               setMarker(location);
             }
-          } else if (message['action'] == 'setMarker'){
-            var marker = message['marker'];
-            setMarker(marker);
-            console.log(JSON.stringify(marker));
+          } else if (message['action'] == 'setLocation'){
+            var location = message['location'];
+            location = new google.maps.LatLng(location.k, location.A);
+            setMarker(location);
+            console.log(JSON.stringify(location));
           }
         }
       }

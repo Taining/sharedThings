@@ -2,7 +2,7 @@ var config = require('./config_node.js');
 
 var WebSocketServer = require('ws').Server, wss = new WebSocketServer({port: config.port});
 var worldArray = {'Default': {}};
-var markerArray = {};
+var locationArray = {};
 var clientIndex = 0;
 
 wss.on('close', function() {
@@ -67,10 +67,10 @@ wss.on('connection', function(ws) {
 		} else if (request['action'] == "requestWorld") {
 			var worldName = request['worldName'];
 			sendWorld(ws, worldName);
-		} else if (request['action'] == 'setMarker'){
+		} else if (request['action'] == 'setLocation'){
 			var index = request['index'];
-			var marker = request['marker'];
-			markerArray[index] = marker;
+			var location = request['location'];
+			locationArray[index] = location;
 			wss.broadcast(message);
 		}
 		
