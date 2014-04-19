@@ -9,7 +9,7 @@ wss.on('close', function() {
     console.log('disconnected');
 });
 
-wss.broadcastObject = function(data) {
+wss.broadcast = function(data) {
     for(var i in this.clients)
         this.clients[i].send(data);
 };
@@ -59,7 +59,7 @@ wss.on('connection', function(ws) {
 			var worldName = request['worldName'];
 			var objectID = request['objectID'];
 			worldArray[worldName][objectID] = request['position'];
-			wss.broadcastObject(message);
+			wss.broadcast(message);
 		} else if (request['action'] == "save") {
 			var worldName = request['worldName'];
 			worldArray[worldName] = request['world'];
@@ -71,6 +71,7 @@ wss.on('connection', function(ws) {
 			var index = request['index'];
 			var location = request['location'];
 			locationArray[index] = location;
+			wss.broadcast(message);
 		}
 		
 	});

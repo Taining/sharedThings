@@ -17,6 +17,7 @@
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <script src="bootstrap/js/bootstrap.min.js"></script>
   <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="config.js" ></script>
   <script type="text/javascript"
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtWOvqQI2BRkYDh7EW07_vOZIRFRC7qTg&sensor=true">
   </script>
@@ -78,6 +79,9 @@
       function success(pos) {
         var crd = pos.coords;
         myLatlng = new google.maps.LatLng(crd.latitude,crd.longitude);
+        var request = {'action': 'setLocation', 'index': clientIndex, 'location': myLatlng};
+        socket.send(JSON.stringify(request));
+        console.log(JSON.stringify(request));
       };
 
       function error(err) {
@@ -86,6 +90,35 @@
 
       function logDrag(event, ui){
         console.log(JSON.stringify(ui.position) + " " + event.target.id); 
+      }
+
+      function updateWholeWorld(){
+        for(var elementId in world){
+          var position = world[elementId];
+          $("#"+elementId).css({
+            'top': position["top"],
+            'left': position["left"]
+          });
+        }
+      }
+
+      function updateWorld(message) {
+        var elementId = message['objectID'];
+        var position = message['position'];
+        world[elementId] = message['position'];
+        
+        $("#"+elementId).css({
+          'top': position["top"],
+          'left': position["left"]
+        });
+      }
+
+      function displayWorlds(worldNames){
+        var html = "<h2>All worlds</h2>";
+        for(var name in worldNames){
+          html += "<li><a href='#' onclick='chooseWorld($(this));'>" + worldNames[name] + "</a></li>";
+        }
+        $("#world-list").html(html);
       }
 
       function setupSocket(){
@@ -112,18 +145,32 @@
             updateWholeWorld();
           } else if (message['action'] == 'setIndex'){
             clientIndex = message['index'];
-            var request = {'action': 'setLocation', 'index': clientIndex, 'location': myLatlng};
-            socket.send(JSON.stringify(request));
+            navigator.geolocation.getCurrentPosition(success, error, options);
           } else if (message['action'] == 'updateLocations') {
-
+            var locations = message['locations'];
+            setMarkers(locations);
+          } else if (message['action'] == 'setLocation'){
+            var location = message['location'];
+            setMarkers([location]);
           }
         }
       }
 
       $(function() { 
         initialize();
-        navigator.geolocation.getCurrentPosition(success, error, options);
         setupSocket();
+
+        $("a").click(function(event){
+            event.preventDefault();
+          });
+
+        $(".draggable").draggable({
+            containment: 'parent'
+        });
+
+        $(".draggable").each(function(key, value){
+          world[$(this).attr("id")] = $(this).position();
+        });
 
         $("#world img").draggable(); 
         $("#world img").on("dragstart", function(event, ui) { logDrag(event, ui); });
@@ -206,6 +253,11 @@
        <img id="o5" src="images/o.gif" style="z-index:2;" /class="draggable" >
        <img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" class="draggable" />
      </div>
+     <div id="share-world">
+      <ul id="world-list"></ul>
+      <input type="text" id="world-name">
+      <input type="Submit" value="Save New World" onclick="saveWorld();">
+    </div>
    </div>
    <div id="map-canvas" class="col-md-6"></div>
  </div>
