@@ -20,11 +20,10 @@ wss.broadcastWorldsName = function (){
 }
 
 function sendWorldForNewClient(ws){
+	console.log(JSON.stringify(worldArray['Default']));
 	if (worldArray['Default']) {
 		var response = {'action': 'update', 'worldName': 'Default', 'world': worldArray['Default']};
 		ws.send(JSON.stringify(response));
-
-		console.log(JSON.stringify(worldArray['Default']));
 	};
 }
 
