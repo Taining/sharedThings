@@ -127,11 +127,6 @@
 				$(".draggable").on("dragstop" , function(event, ui) { handleDrag(event, ui); });
 				$(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
 				
-				$("body").css({
-					width: $(window).width() - 20, // subtract twice the thickness
-					height: $(window).height() - 20, // of the border from each dimension
-					border: '10px solid green'
-				});
 			});
 			
 		</script>

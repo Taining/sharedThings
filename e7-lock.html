@@ -17,15 +17,17 @@
 				position: fixed;
 			} 
 			.element-x {
-			
+				position: absolute;
+				top: 220px;
 			}
 			.element-o {
 				position: absolute;
+				top: 220px;
 				left: 4em;
 			}
 			#tttboard {
 				position: absolute;
-				top: 4em;
+				top: 2em;
 			}
 			#message {
 				color: red;
@@ -60,8 +62,16 @@
 			
 			function handleDragStart(event, ui){
 				var objectID = event.target.id;
+				
+				console.log("Locked = " + locked[objectID]);
+				
 				if(locked[objectID]) {
 					$("#message").html("Someone else is dragging this");
+					
+					setTimeout(function () {
+						$("#message").html("");
+					}, 2000);
+					
 					return;
 				}
 				holdLock[objectID] = true;
@@ -75,7 +85,7 @@
 				var objectID = event.target.id;	
 				
 				if(locked[objectID] && !holdLock[objectID]) {
-					$("#message").html("");
+					$("#message").html("why");
 					return;
 				}
 				
@@ -140,9 +150,13 @@
 					} else if(message['action'] == 'update') {
 						updateWorld(message);
 					} else if(message['action'] == 'lock') {
-						locked[message['objectID']] = true;
+						var objectID = message['objectID'];
+						locked[objectID] = true;
+						$("#"+objectID).draggable( 'disable' );
 					} else if(message['action'] == 'unlock') {
-						locked[message['objectID']] = false;
+						var objectID = message['objectID'];
+						locked[objectID] = false;
+						$("#"+objectID).draggable( 'enable' );
 					} else if(message['action'] == 'sendLockArray') {
 						locked = message['array'];
 					}
@@ -150,8 +164,8 @@
 
 				$(".draggable").draggable(); 
 				$(".draggable").on("dragstart", function(event, ui) { handleDragStart(event, ui); });
-				$(".draggable").on("dragstop" , function(event, ui) { handleDrag(event, ui); });
-				$(".draggable").on("drag"     , function(event, ui) { handleDragEnd(event, ui); });
+				$(".draggable").on("dragstop" , function(event, ui) { handleDragEnd(event, ui); });
+				$(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
 			});
 		</script>
 	</head>
