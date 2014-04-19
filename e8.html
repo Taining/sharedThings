@@ -42,8 +42,7 @@
 				left: 4em;
 			}
 			#restartButton {
-				position: absolute;
-				top: 280px;				
+				position: absolute;			
 			}
 			#tttboard {
 				position: absolute;
@@ -57,10 +56,11 @@
 		<script src="config.js" ></script>
 		<script>
 			var world = {};
+			var originalWorld = {}; 	// for restarting game
 			var socket;
 			var worldName = "Default";
 			
-			var locked = [];	// array of boolean
+			var locked = {};	// array of boolean
 			var holdLock = [];	// array of boolean
 
 			function handleDrag(event, ui){
@@ -112,6 +112,7 @@
 			}
 
 			function updateWholeWorld(){
+				console.log(JSON.stringify(world));
 				for(var elementId in world){
 					var position = world[elementId];
 					$("#"+elementId).css({
@@ -151,6 +152,7 @@
 
 			function saveWorld(){
 				worldName = $("#world-name").val();
+				console.log(worldName);
 				
 				$(".draggable").each(function() {
 					holdLock[$(this).attr("id")] = false;
@@ -159,6 +161,9 @@
   					
 				var request = {'action': 'save', 'worldName': worldName, 'world': world, 'locked':locked};
 				socket.send(JSON.stringify(request));
+				
+				console.log("After save world, worldName is: "+worldName);
+				console.log("after save world, world is: "+JSON.stringify(world));
 			}
 
 			function displayWorlds(worldNames){
@@ -177,14 +182,28 @@
 				socket.send(JSON.stringify(request));
 			}
 
+			function getDefaultWorld() {
+				console.log("client get default world, propose: " + JSON.stringify(world));
+				originalWorld = JSON.parse(JSON.stringify(world));
+
+				var request = {'action':'getDefaultWorld', 'proposedWorld':world};
+				socket.send(JSON.stringify(request));
+			}
+
 			function setupSocket(){
 				socket = new WebSocket("ws://localhost:" + port);
 				socket.onopen = function (event) {
   					$(".draggable").each(function() {
   						holdLock[$(this).attr("id")] = false;
   						locked[$(this).attr("id")] = false;
+  						console.log($(this).attr("id"));
+  						console.log("locked array to be proposed: "+JSON.stringify(locked));
+  						world[$(this).attr("id")] = $(this).position();
   					});
+  					console.log("locked array to be proposed: "+locked.toString());
   					getLockArray();
+  					
+  					getDefaultWorld();
 				};
 				socket.onclose = function (event) {
 					alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
@@ -215,15 +234,24 @@
 						locked = message['array'];
 					} else if(message['action'] == 'resetWorld') {
 						if(message['worldName'] != worldName) return;
-						world = {};
+						world = message['world'];
 						locked = message['lockedArray'];
+						
+						updateWholeWorld();
 						
 						$(".draggable").draggable( 'enable' );
 						$(".draggable").each(function(key, value){
 							holdLock[$(this).attr("id")] = false;
 						}); 
 						
-						location.reload();
+						// location.reload();
+					} else if(message['action'] == 'getDefaultWorld') {
+						if(message['worldName'] != worldName) return;
+						world = message['proposedWorld'];
+						
+						console.log("after get default world, world is: "+JSON.stringify(world));
+  						console.log("after get default world, worldName is: "+worldName);
+  			
 					}
 				};
 			}
@@ -235,17 +263,19 @@
 			
 			
 			function restartGame() {
-			/*
+				world = originalWorld;
+				
 				console.log("restart");
-				world = {};
-				// updateWholeWorld();
+				console.log("get back to original world: "+JSON.stringify(world));
+				
+				updateWholeWorld();
 				$(".draggable").each(function() {
 					holdLock[$(this).attr("id")] = false;
 					locked[$(this).attr("id")] = false;
 				});
-				var request = {'action': 'resetWorld', 'worldName': worldName, 'lockedArray': locked};
+				var request = {'action': 'resetWorld', 'worldName': worldName, 'lockedArray': locked, 'world':world};
 				socket.send(JSON.stringify(request));
-				location.reload();*/
+				// location.reload();
 			}
 			
 
@@ -258,11 +288,11 @@
     				containment: 'parent'
 				});
 
-				/*
+				
 				$(".draggable").each(function(key, value){
 					world[$(this).attr("id")] = $(this).position();
 				}); 
-				*/
+				
 				
 				setupSocket();
 
