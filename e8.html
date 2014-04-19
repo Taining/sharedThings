@@ -38,12 +38,10 @@
 			var worldName = "Default";
 
 			function logDrag(event, ui){
-				world[event.target.id] = ui.position({
-					within: "#world"
-				});
+				world[event.target.id] = ui.position;
 				var request = {'action': 'update', 'worldName': worldName, 'world': world};
 				socket.send(JSON.stringify(request));
-				//console.log(JSON.stringify(request)); 
+				console.log(JSON.stringify(request)); 
 			}
 
 			function updateWorld(){
@@ -113,8 +111,6 @@
 				}); 
 				
 				setupSocket();
-
-				console.log(JSON.stringify(world));
 
 				$(".draggable").draggable(); 
 				$(".draggable").on("dragstart", function(event, ui) { logDrag(event, ui); });
