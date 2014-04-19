@@ -40,10 +40,9 @@ wss.on('connection', function(ws) {
 		var worldName = request['worldName'];
 
 		if (request['action'] == "update") {
-			console.log(message);
 			var objectID = request['objectID'];
 			worldArray[worldName][objectID] = request['position'];
-			wss.broadcast(message);
+			wss.broadcastObject(message);
 		} else if (request['action'] == "save") {
 			worldArray[worldName] = request['world'];
 			wss.broadcastWorldsName();
