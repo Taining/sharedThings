@@ -22,7 +22,7 @@ wss.broadcastWorldsName = function (){
 }
 
 wss.broadcastLocations = function(){
-	var locations [];
+	var locations = [];
 	for (var key in locationArray){
 		locations.push(locationArray[key]);
 	}
