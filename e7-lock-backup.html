@@ -115,23 +115,6 @@
 					'top': position["top"],
 					'left': position["left"]
 				});
-				
-				checkOutOfWindowDragging(elementId, position);
-			}
-			
-			function checkOutOfWindowDragging(elementId, position) {
-				var top = position["top"];
-				var left = position["left"];
-				var width = $(window).width();
-				var height = $(window).height();
-				
-				if(left > width || top > height) {
-					$("#message").html("Someone is dragging outside of the window");
-		
-					setTimeout(function () {
-						$("#message").html("");
-					}, 1000);				
-				}
 			}
 
 			function getLockArray() {
