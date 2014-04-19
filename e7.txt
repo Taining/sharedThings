@@ -1,0 +1,34 @@
+1. 
+Problem: When dragging an element, the entire world object is sent for updating on server and broad cast. This is inefficient. We should send only the updated element position instead.
+
+Solution: Send only the updated element position when an element is being dragged.
+
+2. 
+Problem: If some clients are playing the game, and another client comes in, the elements will go back to their position, i.e., the game is forced to restart. This is not good. We should send the current world state to the newly joined client.
+
+Solution: When a new client joins, server sends it the current world state.
+ 
+3. 
+Problem: Now circles and crosses are stacked together. Users must drag all circles aside before they can drag crosses. This is not good.
+
+Solution: Separate circles and crosses.
+
+4. 
+Problem: Now the board can also be moved. Users may accidentally drag the board when they want to drag an element. We should probably fix the board.
+
+Solution: Fix the board. Now the board cannot be moved.
+
+5. 
+Problem: Cannot easily start the game (by clicking a 'restart' button, for example).
+
+Solution: Put a restart button to reset game state.
+
+6. 
+Problem: If more than one users try to drag the same object, the object will blink here and there. This is not good.
+
+Solution: Store an 'locked' array on server. locked[objectID] = true, if someone is dragging the object. Then when another client tries to drag it, disallow the dragging and display message 'Some one is dragging the same object'. Store an 'holdLock' array on client side. holdLock[objectID] = true, if the client is allowed to drag the object.
+
+7. 
+Problem: If the browser window is small for some client, when other people drag things out of the browser window, this client does not know about it.
+
+Solution: When someone is dragging out of the window, display message 'Someone is dragging out of the window'

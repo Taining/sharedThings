@@ -1,0 +1,13 @@
+1. When dragging an element, the entire world object is sent for updating on server and broad cast. This is inefficient. We should send only the updated element position instead.
+
+2. If some clients are playing the game, and another client comes in, the elements will go back to their position, i.e., the game is forced to restart. This is not good. We should send the current world state to the newly joined client.
+ 
+3. Now circles and crosses are stacked together. Users must drag all circles aside before they can drag crosses. This is not good.
+
+4. Now the board can also be moved. Users may accidentally drag the board when they want to drag an element. We should probably fix the board.
+
+5. Cannot easily start the game (by clicking a 'restart' button, for example).
+
+6. If more than one users try to drag the same object, the object will blink here and there. This is not good.
+
+7. If the browser window is small for some client, when other people drag things out of the browser window, this client does not know about it.

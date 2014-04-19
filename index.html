@@ -1,278 +1,305 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
-  <title>Shared Things</title>
-  <!-- JQuery etc... -->
-  <!-- <link href="jquery-ui-1.10.4.custom/css/smoothness/jquery-ui-1.10.4.custom.css" rel="stylesheet"> ignore jquery ui styles in favour of bootstrap --> 
-  <script src="bootstrap/js/jquery.min.js"></script> 
-  <script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough jquery ui for dragging  -->
-  <script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ so jquery dragging is touch enabled -->
+		<title>Shared Things</title>
+		<!-- JQuery etc... -->
+		<!-- <link href="jquery-ui-1.10.4.custom/css/smoothness/jquery-ui-1.10.4.custom.css" rel="stylesheet"> ignore jquery ui styles in favour of bootstrap --> 
+		<script src="bootstrap/js/jquery.min.js"></script> 
+		<script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough jquery ui for dragging  -->
+		<script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ so jquery dragging is touch enabled -->
 
-  <!-- Bootstrap -->
-  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <script src="bootstrap/js/bootstrap.min.js"></script>
-  <!-- Include all compiled plugins (below), or include individual files as needed -->
-  <script src="config.js" ></script>
-  <script type="text/javascript"
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtWOvqQI2BRkYDh7EW07_vOZIRFRC7qTg&sensor=false">
-  </script>
+		<!-- Bootstrap -->
+		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+		<!-- Include all compiled plugins (below), or include individual files as needed -->
+		<script src="config.js" ></script>
+		<script type="text/javascript"
+			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtWOvqQI2BRkYDh7EW07_vOZIRFRC7qTg&sensor=false">
+		</script>
 
-  <style>
-    .draggable { position: absolute; }
-    html { height: 100% }
-    body { height: 100%; margin: 0; padding: 0 }
-    #map-canvas { 
-      position: relative;
-      height: 500px; width: 500px;
-    }
-    #world {
-      position: relative;
-      height: 500px;
-      width: 500px;
-      border: 1px solid black;
-    } 
-    #share-world {
-      width: 500px;
-      margin: 0 auto;
-    }
-    #tttboard {
-      position: relative;
-      width: 176px;
-      height: 189px;
-      margin: 0 auto;
-    }
-  </style>
+		<style>
+			.draggable { position: absolute; }
+			.element-x {
+				position: absolute;
+				top: 220px;
+			}
+			.element-o {
+				position: absolute;
+				top: 220px;
+				left: 4em;
+			}
+			
+			html { height: 100% }
+			body { height: 100%; margin: 0; padding: 0 }
+			#map-canvas { 
+				position: relative;
+				height: 500px; width: 500px;
+			}
+			#world {
+				position: relative;
+				height: 500px;
+				width: 500px;
+				border: 1px solid black;
+			} 
+			#share-world {
+				width: 500px;
+				margin: 0 auto;
+			}
+			#tttboard {
+				position: relative;
+				width: 176px;
+				height: 189px;
+				margin: 0 auto;
+			}
+		</style>
 
-  <script type="text/javascript">
-      var map;
-      var myLatlng;
-      var clientIndex;
-      var markers = [];
+		<script type="text/javascript">
+			var map;
+			var myLatlng;
+			var clientIndex;
+			var markers = [];
+			
+			var world = {};
+			var socket;
+			var worldName = "Default";
 
-      function initialize() {
-        var mapOptions = {
-          center: new google.maps.LatLng(1.366949, 103.814003),
-          zoom: 11
-        };
-        map = new google.maps.Map(document.getElementById("map-canvas"),
-          mapOptions);
-      }
+			function initialize() {
+				var mapOptions = {
+					center: new google.maps.LatLng(1.366949, 103.814003),
+					zoom: 11
+				};
+				map = new google.maps.Map(document.getElementById("map-canvas"),
+					mapOptions);
+			}
 
-      var options = {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0
-      };
+			var options = {
+				enableHighAccuracy: true,
+				timeout: 5000,
+				maximumAge: 0
+			};
 
-      function setMarker(location){
-        var marker = new google.maps.Marker({
-          position: location,
-        });
-        marker.setMap(map);
-        markers.push(marker);
-      }
+			function setMarker(location){
+				var marker = new google.maps.Marker({
+					position: location,
+				});
+				marker.setMap(map);
+				markers.push(marker);
+			}
 
-      function success(pos) {
-        var crd = pos.coords;
-        myLatlng = new google.maps.LatLng(crd.latitude,crd.longitude);
-        var request = {'action': 'setLocation', 'index': clientIndex, 'location': myLatlng};
-        socket.send(JSON.stringify(request));
-        console.log(JSON.stringify(request));
-      };
+			function success(pos) {
+				var crd = pos.coords;
+				myLatlng = new google.maps.LatLng(crd.latitude,crd.longitude);
+				var request = {'action': 'setLocation', 'index': clientIndex, 'location': myLatlng};
+				socket.send(JSON.stringify(request));
+				console.log(JSON.stringify(request));
+			};
 
-      function error(err) {
-        console.warn('ERROR(' + err.code + '): ' + err.message);
-      };
+			function error(err) {
+				console.warn('ERROR(' + err.code + '): ' + err.message);
+			};
 
-      function logDrag(event, ui){
-        console.log(JSON.stringify(ui.position) + " " + event.target.id); 
-      }
+			function handleDrag(event, ui){
+				var objectID = event.target.id;
+				var position = ui.position;
+				var request = {'action': 'update', 'worldName': worldName, 'objectID': objectID, 'position': ui.position};
+				socket.send(JSON.stringify(request)); 
+			}
 
-      function updateWholeWorld(){
-        for(var elementId in world){
-          var position = world[elementId];
-          $("#"+elementId).css({
-            'top': position["top"],
-            'left': position["left"]
-          });
-        }
-      }
+			function updateWholeWorld(){
+				for(var elementId in world){
+					var position = world[elementId];
+					$("#"+elementId).css({
+						'top': position["top"],
+						'left': position["left"]
+					});
+				}
+			}
 
-      function updateWorld(message) {
-        var elementId = message['objectID'];
-        var position = message['position'];
-        world[elementId] = message['position'];
-        
-        $("#"+elementId).css({
-          'top': position["top"],
-          'left': position["left"]
-        });
-      }
+			function updateWorld(message) {
+				var elementId = message['objectID'];
+				var position = message['position'];
+				world[elementId] = message['position'];
+		
+				$("#"+elementId).css({
+					'top': position["top"],
+					'left': position["left"]
+				});
+			}
 
-      function displayWorlds(worldNames){
-        var html = "<h2>All worlds</h2>";
-        for(var name in worldNames){
-          html += "<li><a href='#' onclick='chooseWorld($(this));'>" + worldNames[name] + "</a></li>";
-        }
-        $("#world-list").html(html);
-      }
+			function displayWorlds(worldNames){
+				var html = "<h2>All worlds</h2>";
+				for(var name in worldNames){
+					html += "<li><a href='#' onclick='chooseWorld($(this));'>" + worldNames[name] + "</a></li>";
+				}
+				$("#world-list").html(html);
+			}
+			
+			function chooseWorld(e){
+				worldName = e.html();
+				//request new world
+				var request = {'action': 'requestWorld', 'worldName': worldName};
+				socket.send(JSON.stringify(request));
+			}
 
-      function setupSocket(){
-        socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
-        socket.onopen = function (event) {
-            
-        };
-        
-        socket.onclose = function (event) {
-          alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
-          var request = {'action': 'deleteLocation', 'index': clientIndex};
-          socket.send(JSON.stringify(request));
-        };
+			function setupSocket(){
+				socket = new WebSocket("ws://localhost:" + port);
+				socket.onopen = function (event) {
+			
+				};
+		
+				socket.onclose = function (event) {
+					alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
+					var request = {'action': 'deleteLocation', 'index': clientIndex};
+					socket.send(JSON.stringify(request));
+				};
 
-        socket.onmessage = function (event) {
-          var message = JSON.parse(event.data);
-          if (message['action'] == 'displayWorlds') {
-            var worldNames = message['worlds'];
-            displayWorlds(worldNames);
-          } else if (message['action'] == 'update' && message['worldName'] == worldName) {
-            updateWorld(message);
-          } else if (message['action'] == 'updateWholeWorld') {
-            world = message['world'];
-            updateWholeWorld();
-          } else if (message['action'] == 'setIndex'){
-            clientIndex = message['index'];
-            navigator.geolocation.getCurrentPosition(success, error, options);
-          } else if (message['action'] == 'updateLocations') {
-            console.log(JSON.stringify(message));
-            //remove all markers
-            for (var marker in markers){
-              marker.setMap(null);
-            }
-            markers = [];
+				socket.onmessage = function (event) {
+					var message = JSON.parse(event.data);
+					
+					if (message['action'] == 'displayWorlds') {
+						var worldNames = message['worlds'];
+						displayWorlds(worldNames);
+					} else if (message['action'] == 'update' && message['worldName'] == worldName) {
+						updateWorld(message);
+					} else if (message['action'] == 'updateWholeWorld') {
+						world = message['world'];
+						updateWholeWorld();
+					} else if (message['action'] == 'setIndex'){
+						clientIndex = message['index'];
+						navigator.geolocation.getCurrentPosition(success, error, options);
+					} else if (message['action'] == 'updateLocations') {
+						console.log(JSON.stringify(message));
+						//remove all markers
+						for (var marker in markers){
+							marker.setMap(null);
+						}
+						markers = [];
 
-            //add new markers
-            var locations = message['locations'];
-            for(var key in locations){
-              var location = locations[key];
-              location = new google.maps.LatLng(location.k,location.A);
-              setMarker(location);
-            }
-          }
-        }
-      }
+						//add new markers
+						var locations = message['locations'];
+						for(var key in locations){
+							var location = locations[key];
+							location = new google.maps.LatLng(location.k,location.A);
+							setMarker(location);
+						}
+					}
+				}
+			}
+	  
+			function displayWorlds(worldNames){
+				var html = "";
+				for(var name in worldNames){
+					html += "<li><a href='#' onclick='chooseWorld($(this));'>" + worldNames[name] + "</a></li>";
+				}
+				$("#world-list").html(html);		
+			}
+			
+			function saveWorld(){
+				worldName = $("#world-name").val();
+				var request = {'action': 'save', 'worldName': worldName, 'world': world};
 
-      $(function() { 
-        initialize();
-        setupSocket();
+				socket.send(JSON.stringify(request));
+			}
 
-        $("a").click(function(event){
-            event.preventDefault();
-          });
+			$(function() { 
+				initialize();
+				setupSocket();
 
-        $(".draggable").draggable({
-            containment: 'parent'
-        });
+				$("a").click(function(event){
+					event.preventDefault();
+				});
 
-        $(".draggable").each(function(key, value){
-          world[$(this).attr("id")] = $(this).position();
-        });
+				$(".draggable").draggable({
+					containment: 'parent'
+				});
 
-        $("#world img").draggable(); 
-        $("#world img").on("dragstart", function(event, ui) { logDrag(event, ui); });
-        $("#world img").on("dragstop" , function(event, ui) { logDrag(event, ui); });
-        $("#world img").on("drag"     , function(event, ui) { logDrag(event, ui); });
-      });
-  </script>
-    </head>
+				$(".draggable").each(function(key, value){
+					world[$(this).attr("id")] = $(this).position();
+				});
 
-    <body style="padding-top:70px; padding-bottom:70px;" >
-<!-- try {.navbar-fixed-top, .navbar-fixed-bottom, .navbar-static-top} X {.navbar-inverse }
-     have to add padding-top:70px, or padding-bottom:70px for fixed navbar
-   -->
-   <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
-    <div class="container-fluid">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="#">Brand</a>
-      </div>
+				$("#world img").draggable(); 
+				$("#world img").on("dragstart", function(event, ui) { handleDrag(event, ui); });
+				$("#world img").on("dragstop" , function(event, ui) { handleDrag(event, ui); });
+				$("#world img").on("drag"     , function(event, ui) { handleDrag(event, ui); });
+			});
+		</script>
+	</head>
 
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-        <ul class="nav navbar-nav">
-          <li class="active"><a href="#">Link</a></li>
-          <li><a href="#">Link</a></li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href="#">Action</a></li>
-              <li><a href="#">Another action</a></li>
-              <li><a href="#">Something else here</a></li>
-              <li class="divider"></li>
-              <li><a href="#">Separated link</a></li>
-              <li class="divider"></li>
-              <li><a href="#">One more separated link</a></li>
-            </ul>
-          </li>
-        </ul>
-        <form class="navbar-form navbar-left">
-          <div class="form-group">
-            <input type="text" class="form-control" placeholder="Search">
-          </div>
-          <button type="submit" class="btn btn-default">Submit</button>
-        </form>
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="#">Link</a></li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-              <li><a href="#">Action</a></li>
-              <li><a href="#">Another action</a></li>
-              <li><a href="#">Something else here</a></li>
-              <li class="divider"></li>
-              <li><a href="#">Separated link</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div><!-- /.navbar-collapse -->
-    </div><!-- /.container-fluid -->
-  </nav>
-  <div class="container">
-    <div class="row">
-     <div class="col-md-6">
-      <div id="world">
-       <img id="x1" src="images/x.gif" style="z-index:2;" class="draggable" />
-       <img id="x2" src="images/x.gif" style="z-index:2;" class="draggable" />
-       <img id="x3" src="images/x.gif" style="z-index:2;" class="draggable" />
-       <img id="x4" src="images/x.gif" style="z-index:2;" class="draggable" />
-       <img id="x5" src="images/x.gif" style="z-index:2;" class="draggable" />
-       <img id="o1" src="images/o.gif" style="z-index:2;" class="draggable" />
-       <img id="o2" src="images/o.gif" style="z-index:2;" class="draggable" />
-       <img id="o3" src="images/o.gif" style="z-index:2;" class="draggable" />
-       <img id="o4" src="images/o.gif" style="z-index:2;" class="draggable" />
-       <img id="o5" src="images/o.gif" style="z-index:2;" class="draggable" />
-       <img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" class="draggable" />
-     </div>
-     <div id="share-world">
-      <ul id="world-list"></ul>
-      <input type="text" id="world-name">
-      <input type="Submit" value="Save New World" onclick="saveWorld();">
-    </div>
-   </div>
-   <div id="map-canvas" class="col-md-6"></div>
- </div>
-</div>
+	<body style="padding-top:70px; padding-bottom:70px;" >
+		<!-- try {.navbar-fixed-top, .navbar-fixed-bottom, .navbar-static-top} X {.navbar-inverse }
+		 have to add padding-top:70px, or padding-bottom:70px for fixed navbar
+		-->
+		<nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+			<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="#">Dragging in Your World</a>
+				</div>
 
-</body>
+				<!-- Collect the nav links, forms, and other content for toggling -->
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="#">Link</a></li>
+						<li><a href="#">Link</a></li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Choose world<b class="caret"></b></a>
+							<ul class="dropdown-menu" id="world-list"></ul>
+						</li>
+					</ul>
+					<form class="navbar-form navbar-left">
+						<div class="form-group">
+							<input type="text" id="world-name" class="form-control" placeholder="Your world name">
+						</div>
+						<button class="btn btn-default" onclick="saveWorld()">Save new world</button>
+					</form>
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="#">Link</a></li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li><a href="#">Action</a></li>
+								<li><a href="#">Another action</a></li>
+								<li><a href="#">Something else here</a></li>
+								<li class="divider"></li>
+								<li><a href="#">Separated link</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div><!-- /.navbar-collapse -->
+			</div><!-- /.container-fluid -->
+		</nav>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6">
+					<div id="world">
+						<img id="x1" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+						<img id="x2" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+						<img id="x3" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+						<img id="x4" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+						<img id="x5" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
+						<img id="o1" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+						<img id="o2" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+						<img id="o3" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+						<img id="o4" src="images/o.gif" style="z-index:2;" class="draggable element-o" />
+						<img id="o5" src="images/o.gif" style="z-index:2;" class="draggable element-o" >
+						<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" />
+					</div>
+				</div>
+				<div id="map-canvas" class="col-md-6"></div>
+			</div>
+		</div>
+
+	</body>
 </html>
 
