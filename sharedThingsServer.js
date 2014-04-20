@@ -99,6 +99,7 @@ wss.on('connection', function(ws) {
             ws.send(JSON.stringify(message));
 
         } else if(request['action'] == "resetWorld") {
+        	console.log("reset world");
             worldArray[worldName] = request['world'];
             locked[worldName] = request['lockedArray'];
             wss.broadcast(message);

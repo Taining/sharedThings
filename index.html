@@ -264,6 +264,9 @@
 					} else if(message['action'] == 'lock') {
 						if(message['worldName'] != worldName) return;
 						var objectID = message['objectID'];
+						
+						console.log("lock"+objectID);
+						
 						locked[objectID] = true;
 						$("#"+objectID).draggable( 'disable' );
 					} else if(message['action'] == 'unlock') {
@@ -374,6 +377,8 @@
                 $(".draggable").on("dragstart", function(event, ui) { handleDragStart(event, ui); });
                 $(".draggable").on("dragstop" , function(event, ui) { handleDragEnd(event, ui); });
                 $(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
+                
+                window.addEventListener('shake', shakeEventDidOccur, false);
 			});
 		</script>
 	</head>
