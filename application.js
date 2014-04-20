@@ -174,7 +174,7 @@ function setupSocket(){
 				location = new google.maps.LatLng(location.k,location.A);
 				setMarker(location);
 			}
-			$("#status").html("Currently, " + locations.length + " online users.");
+			$("#status").html(locations.length + " online users at this moment.");
 		} else if(message['action'] == 'lock') {
 			if(message['worldName'] != worldName) return;
 			var objectID = message['objectID'];
