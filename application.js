@@ -254,7 +254,6 @@ function getLockArray() {
 	socket.send(JSON.stringify(request));
 }
 
-
 function restartGame() {
 	world = originalWorld;
 
@@ -268,7 +267,7 @@ function restartGame() {
 	});
 	var request = {'action': 'resetWorld', 'worldName': worldName, 'lockedArray': locked, 'world':world};
 	socket.send(JSON.stringify(request));
-	
+
 }
 
 function shakeEventDidOccur () {
@@ -281,6 +280,16 @@ function getDefaultWorld() {
 
 	var request = {'action':'getDefaultWorld', 'proposedWorld':world};
 	socket.send(JSON.stringify(request));
+}
+
+function switchView(option){
+	if (option == "instruction") {
+		$(".row").hide();
+		$("#instruction").show();
+	} else if (option == "home"){
+		$(".row").show();
+		$("#instruction").hide();
+	}
 }
 
 $(function() { 
