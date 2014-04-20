@@ -26,7 +26,7 @@ Solution: Put a restart button to reset game state.
 6. 
 Problem: If more than one users try to drag the same object, the object will blink here and there. This is not good.
 
-Solution: Store an 'locked' array on server. locked[objectID] = true, if someone is dragging the object. Then when another client tries to drag it, disallow the dragging and display message 'Some one is dragging the same object'. Store an 'holdLock' array on client side. holdLock[objectID] = true, if the client is allowed to drag the object.
+Solution: Store an 'locked' array on server. locked[objectID] = true, if someone is dragging the object. Then when another client tries to drag it, disallow the dragging. Store an 'holdLock' array on client side. holdLock[objectID] = true, if the client is allowed to drag the object.
 
 7. 
 Problem: If the browser window is small for some client, when other people drag things out of the browser window, this client does not know about it.
