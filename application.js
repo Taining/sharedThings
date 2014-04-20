@@ -122,6 +122,8 @@ function checkOutOfWindowDragging(elementId, position) {
 }
 
 function chooseWorld(e){
+	$('.collapse').collapse('hide');	// collapse nav bar for small screen
+	
 	worldName = e.html();
 	$("#world-id").html("Welcome to world '" + worldName + "'!");
 
@@ -204,7 +206,7 @@ function setupSocket(){
 function displayWorlds(worldNames){
 	var html = "";
 	for(var name in worldNames){
-		html += "<li><a href='#' onclick='chooseWorld($(this));'>" + worldNames[name] + "</a></li>";
+		html += "<li><a href='#' onclick='chooseWorld($(this))'>" + worldNames[name] + "</a></li>";
 	}
 	$("#world-list").html(html);		
 }
