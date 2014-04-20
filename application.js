@@ -82,7 +82,7 @@ function handleDragEnd(event, ui){
 	var objectID = event.target.id;
 
 	if(locked[objectID] && !holdLock[objectID]) {
-		$("#message").html("why");
+		$("#message").html("Someone else is dragging this");
 		return;
 	}
 
