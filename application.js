@@ -35,7 +35,6 @@ function success(pos) {
 	myLatlng = new google.maps.LatLng(crd.latitude,crd.longitude);
 	var request = {'action': 'setLocation', 'location': myLatlng};
 	socket.send(JSON.stringify(request));
-	console.log(JSON.stringify(request));
 };
 
 function error(err) {
@@ -143,7 +142,6 @@ function setupSocket(){
 			console.log("locked array to be proposed: "+JSON.stringify(locked));
 			world[$(this).attr("id")] = $(this).position();
 		});
-		console.log("locked array to be proposed: "+locked.toString());
 		getLockArray();
 		getDefaultWorld();
 	};
