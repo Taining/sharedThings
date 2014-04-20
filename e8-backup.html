@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+  		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Shared Things</title>
+        <script src="bootstrap/js/jquery.min.js"></script> <!-- version of jquery for bootstrap -->
+        <script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough of jquery ui for dragging, no more -->
+        <script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ -->
+		<style>
+			.draggable { position: relative; }
+			#world {
+				position: relative;
+				height: 500px;
+				width: 500px;
+				border: 1px solid black;
+				margin: 0 auto;
+			} 
+			#share-world {
+				width: 500px;
+				margin: 0 auto;
+			}
+			#tttboard {
+				position: relative;
+				width: 176px;
+				height: 189px;
+				margin: 0 auto;
+			}
+
+		</style>
+		<script src="config.js" ></script>
+		<script>
+			var world = {};
+			var socket;
+			var worldName = "Default";
+
+			function handleDrag(event, ui){
+				var objectID = event.target.id;
+				var position = ui.position;
+				var request = {'action': 'update', 'worldName': worldName, 'objectID': objectID, 'position': ui.position};
+				socket.send(JSON.stringify(request)); 
+			}
+
+			function updateWholeWorld(){
+				for(var elementId in world){
+					var position = world[elementId];
+					$("#"+elementId).css({
+						'top': position["top"],
+						'left': position["left"]
+					});
+				}
+			}
+			
+			function updateWorld(message) {
+				var elementId = message['objectID'];
+				var position = message['position'];
+				world[elementId] = message['position'];
+				
+				$("#"+elementId).css({
+					'top': position["top"],
+					'left': position["left"]
+				});
+			}
+
+			function saveWorld(){
+				worldName = $("#world-name").val();
+				var request = {'action': 'save', 'worldName': worldName, 'world': world};
+
+				socket.send(JSON.stringify(request));
+			}
+
+			function displayWorlds(worldNames){
+				var html = "<h2>All worlds</h2>";
+				for(var name in worldNames){
+					html += "<li><a href='#' onclick='chooseWorld($(this));'>" + worldNames[name] + "</a></li>";
+				}
+				$("#world-list").html(html);
+			}
+
+			function chooseWorld(e){
+				worldName = e.html();
+				//request new world
+				var request = {'action': 'requestWorld', 'worldName': worldName};
+				socket.send(JSON.stringify(request));
+			}
+
+			function setupSocket(){
+				socket = new WebSocket("ws://localhost:" + port);
+				socket.onopen = function (event) {
+  					
+				};
+				socket.onclose = function (event) {
+					alert("closed code:" + event.code + " reason:" +event.reason + " wasClean:"+event.wasClean);
+				};
+				socket.onmessage = function (event) {
+					var message = JSON.parse(event.data);
+					if (message['action'] == 'displayWorlds') {
+						var worldNames = message['worlds'];
+						displayWorlds(worldNames);
+					} else if (message['action'] == 'update' && message['worldName'] == worldName) {
+						updateWorld(message);
+					} else if (message['action'] == 'updateWholeWorld') {
+						world = message['world'];
+						updateWholeWorld();
+					}
+				}
+			}
+
+			$(function() {
+				$("a").click(function(event){
+    				event.preventDefault();
+    			});
+
+				$(".draggable").draggable({
+    				containment: 'parent'
+				});
+
+				$(".draggable").each(function(key, value){
+					world[$(this).attr("id")] = $(this).position();
+				}); 
+				
+				setupSocket();
+
+				$(".draggable").draggable(); 
+				$(".draggable").on("dragstart", function(event, ui) { handleDrag(event, ui); });
+				$(".draggable").on("dragstop" , function(event, ui) { handleDrag(event, ui); });
+				$(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
+				
+			});
+			
+		</script>
+	</head>
+	<body>
+		<div id="world">
+			<img id="x1" src="images/x.gif" style="z-index:2;" class="draggable" />
+			<img id="x2" src="images/x.gif" style="z-index:2;" class="draggable" />
+			<img id="x3" src="images/x.gif" style="z-index:2;" class="draggable" />
+			<img id="x4" src="images/x.gif" style="z-index:2;" class="draggable" />
+			<img id="x5" src="images/x.gif" style="z-index:2;" class="draggable" />
+			<img id="o1" src="images/o.gif" style="z-index:2;" class="draggable" />
+			<img id="o2" src="images/o.gif" style="z-index:2;" class="draggable" />
+			<img id="o3" src="images/o.gif" style="z-index:2;" class="draggable" />
+			<img id="o4" src="images/o.gif" style="z-index:2;" class="draggable" />
+			<img id="o5" src="images/o.gif" style="z-index:2;" class="draggable" />
+			<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" />
+		</div>
+		<div id="share-world">
+			<ul id="world-list"></ul>
+			<input type="text" id="world-name">
+			<input type="Submit" value="Save New World" onclick="saveWorld();">
+		</div>
+	</body>
+</html>

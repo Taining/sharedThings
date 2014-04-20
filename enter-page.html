@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head> 
+		<link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+		
+		<style>
+			body {
+				background: #751B05 url(images/overlay.png) repeat;
+				text-align: center;
+			}
+			#welcome {
+				position: relative;
+				top: 220px;	
+				width: 700px;
+			}
+			#choose-world {
+				color:#751B05;
+				padding:2em;
+			}
+			#select-label {
+				display:inline;
+			}
+			#select {
+				display:inline;
+				width: 250px;
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		<div class="container theme-showcase" role="main" id="welcome">
+			<div class="jumbotron" id="choose-world">
+				<label id="select-label">
+					<h2>Choose your world&nbsp</h2>
+					<select id="select" class="form-control">
+					  <option value="volvo">Volvo</option>
+					  <option value="saab">Saab</option>
+					  <option value="mercedes">Mercedes</option>
+					  <option value="audi">Audi</option>
+					</select>
+				</label>
+			</div>
+		</div>
+	</body>
+</html>
