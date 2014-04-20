@@ -3,15 +3,12 @@
 	<head>
 		<meta charset="utf-8" />
   		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Shared Things</title>
-
 		<!-- <link href="jquery-ui-1.10.4.custom/css/smoothness/jquery-ui-1.10.4.custom.css" rel="stylesheet"> ignore jquery ui styles, eventually we will use bootstrap styles -->
-
-                <script src="bootstrap/js/jquery.min.js"></script> <!-- version of jquery for bootstrap -->
-                <script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough of jquery ui for dragging, no more -->
-                <script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ -->
+		<script src="bootstrap/js/jquery.min.js"></script> <!-- version of jquery for bootstrap -->
+		<script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough of jquery ui for dragging, no more -->
+		<script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ -->
 		<style>
 			.draggable { 
 				position: fixed;
@@ -45,16 +42,7 @@
 			
 			var socket;
 			function handleDrag(event, ui){
-				//console.log(JSON.stringify(ui.position) + " " + event.target.id);
-				//world[event.target.id] = ui.position;
-				//socket.send(JSON.stringify(world)); 
-				
 				var objectID = event.target.id;
-				
-				console.log("objectID: " + objectID);
-				console.log("locked[objectID]: " + locked[objectID]);
-				console.log("holdLock[objectID]: " + holdLock[objectID]);
-				
 				if(locked[objectID] && !holdLock[objectID]) {
 					return;
 				}
@@ -66,9 +54,6 @@
 			
 			function handleDragStart(event, ui){
 				var objectID = event.target.id;
-				
-				console.log("Locked = " + locked[objectID]);
-				
 				if(locked[objectID]) {
 					$("#message").html("Someone else is dragging this");
 					
@@ -81,21 +66,19 @@
 				holdLock[objectID] = true;
 				var request = {'action': 'lock', 'objectID': objectID};
 				socket.send(JSON.stringify(request));
-				
+
 				handleDrag(event, ui);
 			}
 			
 			function handleDragEnd(event, ui){
 				var objectID = event.target.id;	
-				
 				if(locked[objectID] && !holdLock[objectID]) {
 					$("#message").html("why");
 					return;
 				}
-				
 				var request = {'action': 'unlock', 'objectID': objectID};	
 				socket.send(JSON.stringify(request)); 		
-				
+
 				handleDrag(event, ui);
 				holdLock[objectID] = false;
 			}
@@ -196,12 +179,10 @@
 					} else if(message['action'] == 'resetWorld') {
 						world = {};
 						locked = message['lockedArray'];
-						
 						$(".draggable").draggable( 'enable' );
 						$(".draggable").each(function(key, value){
 							holdLock[$(this).attr("id")] = false;
 						}); 
-						
 						location.reload();
 					}
 				}

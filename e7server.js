@@ -23,27 +23,19 @@ wss.on('connection', function(ws) {
 
 	ws.on('message', function(message) {
 		var request = JSON.parse(message);
-		
-		// console.log(JSON.stringify(Object.keys(worldArray)));
 
 		if (request['action'] == "update") {
-			// worldArray[worldName] = request['world'];
-			
 			var objectID = request['objectID'];
 			world[objectID] = request['position'];
-			
 			wss.broadcast(message);
-			
 		} else if(request['action'] == "lock") {
 			var objectID = 	request['objectID'];
 			locked[objectID] = true;
 			wss.broadcast(message);
-			
 		} else if(request['action'] == "unlock") {
 			var objectID = 	request['objectID'];
 			locked[objectID] = false;
 			wss.broadcast(message);
-			
 		} else if(request['action'] == "getLockArray") {
 			if(locked.length == 0) {
 				// first client
@@ -52,7 +44,6 @@ wss.on('connection', function(ws) {
 			}
 			var message = {'action': 'sendLockArray', 'array': locked};
 			ws.send(JSON.stringify(message));
-			
 		} else if(request['action'] == "resetWorld") {
 			world = {};
 			locked = request['lockedArray'];
