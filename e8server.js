@@ -22,7 +22,6 @@ wss.broadcastWorldsName = function (){
 function sendWorld(ws, worldName){
 	if (!worldArray[worldName]) console.log("undefined world");
 	if (worldArray[worldName]) {
-		console.log("update whole world: "+worldName);
 		var response = {'action': 'updateWholeWorld', 'world': worldArray[worldName], 'locked':locked[worldName]};
 		ws.send(JSON.stringify(response));
 	}
@@ -41,7 +40,6 @@ wss.on('connection', function(ws) {
 		var worldName = request['worldName'];
 
 		if (request['action'] == "update") {
-			console.log(message);
 			var objectID = request['objectID'];
 			worldArray[worldName][objectID] = request['position'];
 			wss.broadcastObject(message);
@@ -64,8 +62,6 @@ wss.on('connection', function(ws) {
 		} else if(request['action'] == "getLockArray") {
 			if(locked['Default'].length == 0) {
 				// first client
-				console.log("locked array is empty, accept proposed locked array");
-				console.log(JSON.stringify(request['proposedArray']));
 				locked['Default'] = request['proposedArray'];
 				return;
 			}
@@ -78,7 +74,6 @@ wss.on('connection', function(ws) {
 		} else if(request['action'] == "getDefaultWorld") {
 			if(Object.keys(worldArray['Default']).length === 0) {
 				// first client
-				console.log("first client");
 				worldArray['Default'] = request['proposedWorld'];
 				wss.broadcastObject(message);
 			} else {
