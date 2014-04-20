@@ -1,0 +1,35 @@
+.draggable { position: absolute; }
+.element-x {
+	position: absolute;
+	top: 230px;
+}
+.element-o {
+	position: absolute;
+	top: 230px;
+	left: 4em;
+}
+
+html { height: 100% }
+body { height: 100%; margin: 0; padding: 0 }
+#map-canvas { 
+	position: relative;
+	margin-top: -15px;
+	height: 400px; width: 100%;
+}
+#world {
+	position: relative;
+	height: 500px;
+	width: 100%;
+	border: 1px solid black;
+}
+#tttboard {
+	position: relative;
+	top: 2em;
+	width: 176px;
+	height: 189px;
+	margin: 0 auto;
+}
+#message {
+	color: red;
+	height:1em;
+}
