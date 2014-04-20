@@ -84,7 +84,7 @@ wss.on('connection', function(ws) {
 			wss.broadcastObject(message);
 			
 		} else if(request['action'] == "getDefaultWorld") {
-			if(worldArray['Default'].length == 0) {
+			if(Object.keys(worldArray['Default']).length === 0) {
 				// first client
 				console.log("first client");
 				worldArray['Default'] = request['proposedWorld'];
