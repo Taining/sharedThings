@@ -183,7 +183,7 @@
 			}
 
 			function setupSocket(){
-				socket = new WebSocket("ws://localhost:" + port);
+				socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
 				socket.onopen = function (event) {
   					$(".draggable").each(function() {
   						holdLock[$(this).attr("id")] = false;
