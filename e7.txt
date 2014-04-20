@@ -4,7 +4,7 @@ Problem: When dragging an element, the entire world object is sent for updating 
 Solution: Send only the updated element position when an element is being dragged.
 
 2. 
-Problem: If some clients are playing the game, and another client comes in, the elements will go back to their position, i.e., the game is forced to restart. This is not good. We should send the current world state to the newly joined client.
+Problem: If some clients are playing the game, and another client comes in, all elements will go back to their original position, i.e. the game is forced to restart. This is not good. We should send the current world state to the newly joined client.
 
 Solution: When a new client joins, server sends it the current world state.
  
