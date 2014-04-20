@@ -237,6 +237,7 @@ function displayWorlds(worldNames){
 
 function saveWorld(){
 	worldName = $("#world-name").val();
+	$("#world-id").html("Welcome to world '" + worldName + "'!");
 	$("#world-name").val("");
 
 	$(".draggable").each(function() {
@@ -245,7 +246,6 @@ function saveWorld(){
 	});
 
 	var request = {'action': 'save', 'worldName': worldName, 'world': world, 'locked':locked};
-
 	socket.send(JSON.stringify(request));
 }
 
