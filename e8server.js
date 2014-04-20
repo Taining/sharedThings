@@ -1,8 +1,6 @@
 var config = require('./config_node.js');
-
 var WebSocketServer = require('ws').Server, wss = new WebSocketServer({port: config.port});
 var worldArray = {'Default': []};
-
 var locked = {'Default': []};
 
 wss.on('close', function() {
@@ -36,7 +34,6 @@ function sendWorldsNameForNewClient(ws){
 }
 
 wss.on('connection', function(ws) {
-	// sendWorld(ws, 'Default');
 	sendWorldsNameForNewClient(ws);
 
 	ws.on('message', function(message) {
@@ -54,19 +51,16 @@ wss.on('connection', function(ws) {
 			wss.broadcastWorldsName();
 		} else if (request['action'] == "requestWorld") {
 			sendWorld(ws, worldName);
-			
 		} else if(request['action'] == "lock") {
 			var worldName = request['worldName'];
 			var objectID = 	request['objectID'];
 			locked[worldName][objectID] = true;
 			wss.broadcastObject(message);
-			
 		} else if(request['action'] == "unlock") {
 			var worldName = request['worldName'];
 			var objectID = 	request['objectID'];
 			locked[worldName][objectID] = false;
 			wss.broadcastObject(message);
-			
 		} else if(request['action'] == "getLockArray") {
 			if(locked['Default'].length == 0) {
 				// first client
@@ -77,12 +71,10 @@ wss.on('connection', function(ws) {
 			}
 			var message = {'action': 'sendLockArray', 'array': locked['Default']};
 			ws.send(JSON.stringify(message));
-			
 		} else if(request['action'] == "resetWorld") {
 			worldArray[worldName] = request['world'];
 			locked[worldName] = request['lockedArray'];
 			wss.broadcastObject(message);
-			
 		} else if(request['action'] == "getDefaultWorld") {
 			if(Object.keys(worldArray['Default']).length === 0) {
 				// first client
@@ -96,3 +88,4 @@ wss.on('connection', function(ws) {
 		
 	});
 });
+

@@ -21,14 +21,6 @@
 				width: 500px;
 				margin: 0 auto;
 			}
-			/*
-			#tttboard {
-				position: relative;
-				width: 176px;
-				height: 189px;
-				margin: 0 auto;
-			}*/
-			
 			.draggable { 
 				position: fixed;
 			} 
@@ -236,22 +228,14 @@
 						if(message['worldName'] != worldName) return;
 						world = message['world'];
 						locked = message['lockedArray'];
-						
 						updateWholeWorld();
-						
 						$(".draggable").draggable( 'enable' );
 						$(".draggable").each(function(key, value){
 							holdLock[$(this).attr("id")] = false;
 						}); 
-						
-						// location.reload();
 					} else if(message['action'] == 'getDefaultWorld') {
 						if(message['worldName'] != worldName) return;
 						world = message['proposedWorld'];
-						
-						console.log("after get default world, world is: "+JSON.stringify(world));
-  						console.log("after get default world, worldName is: "+worldName);
-  			
 					}
 				};
 			}
@@ -261,13 +245,8 @@
 				socket.send(JSON.stringify(request)); 
 			}
 			
-			
 			function restartGame() {
 				world = originalWorld;
-				
-				console.log("restart");
-				console.log("get back to original world: "+JSON.stringify(world));
-				
 				updateWholeWorld();
 				$(".draggable").each(function() {
 					holdLock[$(this).attr("id")] = false;
@@ -275,7 +254,6 @@
 				});
 				var request = {'action': 'resetWorld', 'worldName': worldName, 'lockedArray': locked, 'world':world};
 				socket.send(JSON.stringify(request));
-				// location.reload();
 			}
 			
 
@@ -288,11 +266,9 @@
     				containment: 'parent'
 				});
 
-				
 				$(".draggable").each(function(key, value){
 					world[$(this).attr("id")] = $(this).position();
 				}); 
-				
 				
 				setupSocket();
 
@@ -300,7 +276,6 @@
 				$(".draggable").on("dragstart", function(event, ui) { handleDragStart(event, ui); });
 				$(".draggable").on("dragstop" , function(event, ui) { handleDragEnd(event, ui); });
 				$(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
-				
 			});
 			
 		</script>
