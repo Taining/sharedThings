@@ -3,15 +3,12 @@
 	<head>
 		<meta charset="utf-8" />
   		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Shared Things</title>
-
 		<!-- <link href="jquery-ui-1.10.4.custom/css/smoothness/jquery-ui-1.10.4.custom.css" rel="stylesheet"> ignore jquery ui styles, eventually we will use bootstrap styles -->
-
-                <script src="bootstrap/js/jquery.min.js"></script> <!-- version of jquery for bootstrap -->
-                <script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough of jquery ui for dragging, no more -->
-                <script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ -->
+		<script src="bootstrap/js/jquery.min.js"></script> <!-- version of jquery for bootstrap -->
+		<script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough of jquery ui for dragging, no more -->
+		<script src="jquery.ui.touch-punch/jquery.ui.touch-punch.min.js"></script> <!-- http://touchpunch.furf.com/ -->
 		<style>
 			.draggable { position: fixed; } 
 		</style>
@@ -20,7 +17,6 @@
 			var world = {};
 			var socket;
 			function logDrag(event, ui){
-				//console.log(JSON.stringify(ui.position) + " " + event.target.id);
 				world[event.target.id] = ui.position;
 				socket.send(JSON.stringify(world)); 
 			}

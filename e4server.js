@@ -15,7 +15,6 @@ wss.broadcast = function(data) {
 wss.on('connection', function(ws) {
 	ws.on('message', function(message) {
 		world = JSON.parse(message);
-		//console.log(message);
 		wss.broadcast(message);
 	});
 });
