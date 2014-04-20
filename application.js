@@ -1,22 +1,19 @@
 var map;
+var socket;
 var myLatlng;
+var worldName = "Default";
 var markers = [];
-
 var world = {};
 var originalWorld = {}; 	// for restarting game
-var socket;
-var worldName = "Default";
-
 var locked = {};	// array of boolean
 var holdLock = [];	// array of boolean
 
-function initialize() {
+function initializeMap() {
 	var mapOptions = {
 		center: new google.maps.LatLng(1.2951070999999998, 103.77401559999998),
 		zoom: 16
 	};
-	map = new google.maps.Map(document.getElementById("map-canvas"),
-		mapOptions);
+	map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
 }
 
 var options = {
@@ -47,11 +44,9 @@ function error(err) {
 
 function handleDrag(event, ui){
 	var objectID = event.target.id;
-
 	if(locked[objectID] && !holdLock[objectID]) {
 		return;
 	}
-
 	var position = ui.position;
 	var request = {'action': 'update', 'worldName': worldName, 'objectID': objectID, 'position': ui.position};
 	socket.send(JSON.stringify(request)); 
@@ -59,9 +54,6 @@ function handleDrag(event, ui){
 
 function handleDragStart(event, ui){
 	var objectID = event.target.id;
-
-	console.log("Locked = " + locked[objectID]);
-
 	if(locked[objectID]) {
 		$("#message").html("Someone else is dragging this");
 
@@ -80,12 +72,10 @@ function handleDragStart(event, ui){
 
 function handleDragEnd(event, ui){
 	var objectID = event.target.id;
-
 	if(locked[objectID] && !holdLock[objectID]) {
 		$("#message").html("Someone else is dragging this");
 		return;
 	}
-
 	var request = {'action': 'unlock', 'worldName': worldName, 'objectID': objectID};	
 	socket.send(JSON.stringify(request)); 		
 
@@ -131,27 +121,19 @@ function checkOutOfWindowDragging(elementId, position) {
 	}
 }
 
-function displayWorlds(worldNames){
-	var html = "<h2>All worlds</h2>";
-	for(var name in worldNames){
-		html += "<li><a href='#' onclick='chooseWorld($(this));'>" + worldNames[name] + "</a></li>";
-	}
-	$("#world-list").html(html);
-}
-
 function chooseWorld(e){
 	worldName = e.html();
 	$("#world-id").html("Welcome to world '" + worldName + "'!");
-	//request new world
+
 	var request = {'action': 'requestWorld', 'worldName': worldName};
 	socket.send(JSON.stringify(request));
 }
 
 function setupSocket(){
 	socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
+	
 	socket.onopen = function (event) {
 		navigator.geolocation.getCurrentPosition(success, error, options);
-
 		$(".draggable").each(function() {
 			holdLock[$(this).attr("id")] = false;
 			locked[$(this).attr("id")] = false;
@@ -161,7 +143,6 @@ function setupSocket(){
 		});
 		console.log("locked array to be proposed: "+locked.toString());
 		getLockArray();
-
 		getDefaultWorld();
 	};
 
@@ -181,7 +162,6 @@ function setupSocket(){
 			world = message['world'];
 			updateWholeWorld();
 		} else if (message['action'] == 'updateLocations') {
-			// console.log(JSON.stringify(message));
 			for (var key in markers){
 				markers[key].setMap(null);
 			}
@@ -196,9 +176,6 @@ function setupSocket(){
 		} else if(message['action'] == 'lock') {
 			if(message['worldName'] != worldName) return;
 			var objectID = message['objectID'];
-
-			console.log("lock"+objectID);
-
 			locked[objectID] = true;
 			$("#"+objectID).draggable( 'disable' );
 		} else if(message['action'] == 'unlock') {
@@ -219,10 +196,7 @@ function setupSocket(){
 			});
 		} else if(message['action'] == 'getDefaultWorld') {
 			if(message['worldName'] != worldName) return;
-			world = message['proposedWorld'];
-
-			console.log("after get default world, world is: "+JSON.stringify(world));
-			console.log("after get default world, worldName is: "+worldName);          
+			world = message['proposedWorld'];         
 		}
 	};
 }
@@ -236,12 +210,10 @@ function displayWorlds(worldNames){
 }
 
 function saveWorld(){
-	console.log($("#world-name").val());
 	if ($("#world-name").val()) {
 		worldName = $("#world-name").val();
 		$("#world-id").html("Welcome to world '" + worldName + "'!");
 		$("#world-name").val("");
-
 		$(".draggable").each(function() {
 			holdLock[$(this).attr("id")] = false;
 			locked[$(this).attr("id")] = false;
@@ -261,10 +233,6 @@ function getLockArray() {
 
 function restartGame() {
 	world = originalWorld;
-
-	console.log("restart");
-	console.log("get back to original world: "+JSON.stringify(world));
-
 	updateWholeWorld();
 	$(".draggable").each(function() {
 		holdLock[$(this).attr("id")] = false;
@@ -272,7 +240,6 @@ function restartGame() {
 	});
 	var request = {'action': 'resetWorld', 'worldName': worldName, 'lockedArray': locked, 'world':world};
 	socket.send(JSON.stringify(request));
-
 }
 
 function shakeEventDidOccur () {
@@ -280,9 +247,7 @@ function shakeEventDidOccur () {
 }
 
 function getDefaultWorld() {
-	console.log("client get default world, propose: " + JSON.stringify(world));
 	originalWorld = JSON.parse(JSON.stringify(world));
-
 	var request = {'action':'getDefaultWorld', 'proposedWorld':world};
 	socket.send(JSON.stringify(request));
 }
@@ -298,7 +263,7 @@ function switchView(option){
 }
 
 $(function() { 
-	initialize();
+	initializeMap();
 	setupSocket();
 
 	$("#world-id").html("Welcome to world '" + worldName + "'!");
