@@ -256,9 +256,13 @@ function switchView(option){
 	if (option == "instruction") {
 		$(".row").hide();
 		$("#instruction").show();
+		$("#instr").addClass("active");
+		$("#home").removeClass("active");
 	} else if (option == "home"){
 		$(".row").show();
 		$("#instruction").hide();
+		$("#home").addClass("active");
+		$("#instr").removeClass("active");
 	}
 }
 
