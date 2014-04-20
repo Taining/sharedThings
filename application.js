@@ -236,17 +236,22 @@ function displayWorlds(worldNames){
 }
 
 function saveWorld(){
-	worldName = $("#world-name").val();
-	$("#world-id").html("Welcome to world '" + worldName + "'!");
-	$("#world-name").val("");
+	console.log($("#world-name").val());
+	if ($("#world-name").val()) {
+		worldName = $("#world-name").val();
+		$("#world-id").html("Welcome to world '" + worldName + "'!");
+		$("#world-name").val("");
 
-	$(".draggable").each(function() {
-		holdLock[$(this).attr("id")] = false;
-		locked[$(this).attr("id")] = false;
-	});
+		$(".draggable").each(function() {
+			holdLock[$(this).attr("id")] = false;
+			locked[$(this).attr("id")] = false;
+		});
 
-	var request = {'action': 'save', 'worldName': worldName, 'world': world, 'locked':locked};
-	socket.send(JSON.stringify(request));
+		var request = {'action': 'save', 'worldName': worldName, 'world': world, 'locked':locked};
+		socket.send(JSON.stringify(request));
+	} else {
+		$("#world-name").popover('show');
+	}
 }
 
 function getLockArray() {

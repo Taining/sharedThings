@@ -6,7 +6,6 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 		<title>Shared Things</title>
-		<!-- JQuery etc... -->
 		<!-- <link href="jquery-ui-1.10.4.custom/css/smoothness/jquery-ui-1.10.4.custom.css" rel="stylesheet"> ignore jquery ui styles in favour of bootstrap --> 
 		<script src="bootstrap/js/jquery.min.js"></script> 
 		<script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js"></script> <!-- enough jquery ui for dragging  -->
@@ -53,9 +52,9 @@
 					</ul>
 					<form class="navbar-form navbar-left">
 						<div class="form-group">
-							<input type="text" id="world-name" class="form-control" placeholder="Your world name">
+							<input type="text" id="world-name" class="form-control" placeholder="Your world name" data-container="body" data-toggle="popover" data-placement="bottom" data-content="World name cannot be empty.">
 						</div>
-						<button class="btn btn-info" onclick="saveWorld()">Save new world</button>
+						<button type="button" class="btn btn-info" onclick="saveWorld()">Save new world</button>
 					</form>
 					<ul class="nav navbar-nav navbar-right">
 						<li><a href="#" onclick="restartGame()">Click or Shake to Restart</a></li>
