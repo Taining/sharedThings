@@ -45,7 +45,7 @@
 			#world {
 				position: relative;
 				height: 500px;
-				width: 500px;
+				width: 100%;
 				border: 1px solid black;
 			}
 			#tttboard {
@@ -67,7 +67,7 @@
 			var markers = [];
 			
 			var world = {};
-            var originalWorld = {}; 	// for restarting game
+      var originalWorld = {}; 	// for restarting game
 			var socket;
 			var worldName = "Default";
             
@@ -214,19 +214,19 @@
 			function setupSocket(){
 				socket = new WebSocket("ws://cp3101b-1.comp.nus.edu.sg:" + port);
 				socket.onopen = function (event) {
-                    navigator.geolocation.getCurrentPosition(success, error, options);
-                    
-  					$(".draggable").each(function() {
-                         holdLock[$(this).attr("id")] = false;
-                         locked[$(this).attr("id")] = false;
-                         console.log($(this).attr("id"));
-                         console.log("locked array to be proposed: "+JSON.stringify(locked));
-                         world[$(this).attr("id")] = $(this).position();
-                    });
-                    console.log("locked array to be proposed: "+locked.toString());
-                    getLockArray();
+					navigator.geolocation.getCurrentPosition(success, error, options);
 
-                    getDefaultWorld();
+					$(".draggable").each(function() {
+						holdLock[$(this).attr("id")] = false;
+						locked[$(this).attr("id")] = false;
+						console.log($(this).attr("id"));
+						console.log("locked array to be proposed: "+JSON.stringify(locked));
+						world[$(this).attr("id")] = $(this).position();
+					});
+					console.log("locked array to be proposed: "+locked.toString());
+					getLockArray();
+
+					getDefaultWorld();
 				};
 		
 				socket.onclose = function (event) {
@@ -259,6 +259,10 @@
 							location = new google.maps.LatLng(location.k,location.A);
 							setMarker(location);
 						}
+
+						//display number of active users
+						$("#status").html("Currently, " + locations.length + " online users.");
+
 					} else if(message['action'] == 'lock') {
 						if(message['worldName'] != worldName) return;
 						var objectID = message['objectID'];
@@ -373,12 +377,12 @@
 					world[$(this).attr("id")] = $(this).position();
 				});
 
-                $(".draggable").draggable();
-                $(".draggable").on("dragstart", function(event, ui) { handleDragStart(event, ui); });
-                $(".draggable").on("dragstop" , function(event, ui) { handleDragEnd(event, ui); });
-                $(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
-                
-                window.addEventListener('shake', shakeEventDidOccur, false);
+				$(".draggable").draggable();
+				$(".draggable").on("dragstart", function(event, ui) { handleDragStart(event, ui); });
+				$(".draggable").on("dragstop" , function(event, ui) { handleDragEnd(event, ui); });
+				$(".draggable").on("drag"     , function(event, ui) { handleDrag(event, ui); });
+
+				window.addEventListener('shake', shakeEventDidOccur, false);
 			});
 		</script>
 	</head>
@@ -426,7 +430,7 @@
 			<div class="row">
 				<div class="col-md-6">
 					<div id="world">
-                        <div id="message"></div>
+            <div id="message"></div>
 						<img id="x1" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
 						<img id="x2" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
 						<img id="x3" src="images/x.gif" style="z-index:2;" class="draggable element-x" />
