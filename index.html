@@ -38,24 +38,25 @@
 			body { height: 100%; margin: 0; padding: 0 }
 			#map-canvas { 
 				position: relative;
-				height: 500px; width: 500px;
+				margin-top: -15px;
+				height: 400px; width: 100%;
 			}
 			#world {
 				position: relative;
 				height: 500px;
 				width: 500px;
 				border: 1px solid black;
-			} 
-			#share-world {
-				width: 500px;
-				margin: 0 auto;
 			}
 			#tttboard {
-				position: relative;
+				position: absolute;
 				width: 176px;
 				height: 189px;
 				margin: 0 auto;
 			}
+			.col-md-6 {
+				height: 500px;
+			}
+
 		</style>
 
 		<script type="text/javascript">
@@ -69,8 +70,8 @@
 
 			function initialize() {
 				var mapOptions = {
-					center: new google.maps.LatLng(1.366949, 103.814003),
-					zoom: 11
+					center: new google.maps.LatLng(1.2951070999999998, 103.77401559999998),
+					zoom: 16
 				};
 				map = new google.maps.Map(document.getElementById("map-canvas"),
 					mapOptions);
@@ -140,6 +141,7 @@
 			
 			function chooseWorld(e){
 				worldName = e.html();
+				$("#world-id").html("Welcome to world '" + worldName + "'!");
 				//request new world
 				var request = {'action': 'requestWorld', 'worldName': worldName};
 				socket.send(JSON.stringify(request));
@@ -181,6 +183,9 @@
 							location = new google.maps.LatLng(location.k,location.A);
 							setMarker(location);
 						}
+
+						//update active people count
+						$("#status").html("Currently, " + locations.length + " active users.");
 					}
 				}
 			}
@@ -196,13 +201,14 @@
 			function saveWorld(){
 				worldName = $("#world-name").val();
 				var request = {'action': 'save', 'worldName': worldName, 'world': world};
-
 				socket.send(JSON.stringify(request));
 			}
 
 			$(function() { 
 				initialize();
 				setupSocket();
+
+				$("#world-id").html("Welcome to world '" + worldName + "'!");
 
 				$("a").click(function(event){
 					event.preventDefault();
@@ -216,7 +222,7 @@
 					world[$(this).attr("id")] = $(this).position();
 				});
 
-				$("#world img").draggable(); 
+				$("#world img.draggable").draggable(); 
 				$("#world img").on("dragstart", function(event, ui) { handleDrag(event, ui); });
 				$("#world img").on("dragstop" , function(event, ui) { handleDrag(event, ui); });
 				$("#world img").on("drag"     , function(event, ui) { handleDrag(event, ui); });
@@ -238,16 +244,14 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="#">Dragging in Your World</a>
+					<a class="navbar-brand" href="#">SharedThings</a>
 				</div>
 
 				<!-- Collect the nav links, forms, and other content for toggling -->
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav">
-						<li class="active"><a href="#">Link</a></li>
-						<li><a href="#">Link</a></li>
-						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Choose world<b class="caret"></b></a>
+						<li class="dropdown active">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Choose World<b class="caret"></b></a>
 							<ul class="dropdown-menu" id="world-list"></ul>
 						</li>
 					</ul>
@@ -290,7 +294,13 @@
 						<img id="tttboard" src="images/tictactoe.gif" style="z-index:1;" />
 					</div>
 				</div>
-				<div id="map-canvas" class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="panel panel-info">
+						<div class="panel-heading" id="world-id"></div>
+						<div class="panel-body" id="status"></div>
+					</div>
+					<div id="map-canvas"></div>
+				</div>
 			</div>
 		</div>
 
